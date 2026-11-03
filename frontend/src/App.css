@@ -1,0 +1,204 @@
+:root {
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --glass-bg: rgba(15, 23, 42, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent-day: #38bdf8;
+  --accent-night: #a78bfa;
+}
+
+.viewport-app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #0b0914;
+  font-family: var(--font-family);
+  color: var(--text-main);
+  user-select: none;
+}
+
+/* Fullscreen Phaser Canvas Container */
+.phaser-viewport-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0b0914;
+  z-index: 1;
+}
+
+.phaser-viewport-container canvas {
+  display: block;
+}
+
+/* Minimalist Floating HUD Overlay */
+.minimal-hud {
+  position: fixed;
+  top: 14px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 50;
+  gap: 12px;
+}
+
+/* Brand pill on top-left */
+.hud-pill.brand-pill {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hud-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.status-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.status-indicator-dot.day {
+  background-color: var(--accent-day);
+  box-shadow: 0 0 8px var(--accent-day);
+}
+
+.status-indicator-dot.night {
+  background-color: var(--accent-night);
+  box-shadow: 0 0 8px var(--accent-night);
+}
+
+.status-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+}
+
+/* Actions group on top-right */
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.hud-pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-main);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hud-pill-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.hud-pill-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.hud-pill-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Day / Night Button Variants */
+.mode-btn.day {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.mode-btn.day:hover:not(:disabled) {
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+.mode-btn.night {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.mode-btn.night:hover:not(:disabled) {
+  border-color: rgba(167, 139, 250, 0.7);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.25);
+}
+
+/* Grid Button Toggle Active State */
+.grid-btn.active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: var(--accent-day);
+  color: var(--accent-day);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+}
+
+.btn-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.btn-label {
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 640px) {
+  .minimal-hud {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hud-pill.brand-pill {
+    padding: 5px 12px;
+  }
+
+  .hud-pill-button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
