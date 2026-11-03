@@ -1,8 +1,9 @@
 import * as Phaser from 'phaser';
 import { MainScene } from './scenes/MainScene';
 
-export const GAME_WIDTH = 1680;
-export const GAME_HEIGHT = 938;
+export const GAME_WIDTH = 1671;
+export const GAME_HEIGHT = 941;
+export const GRID_SIZE = 20;
 
 export const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => ({
   type: Phaser.AUTO,
