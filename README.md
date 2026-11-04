@@ -55,44 +55,6 @@ The system is decoupled into three cohesive tiers:
    - `Task` & `TaskExecutionLog`: Historical and active task assignments, execution metrics, and full traceability.
    - `IntegrationCredential` & `AutomationWorkflow`: Service credentials and automated workflow triggers.
 
----
-
-## Configuration
-
-Set the required environment variables in `backend/.env`:
-
-```env
-PORT=3001
-NODE_ENV=development
-
-# PostgreSQL Database Connection (Port 5432)
-DATABASE_URL="postgresql://admin:admin123@localhost:5432/sleeply_db?schema=public"
-
-# Authentication & Security
-JWT_SECRET="sleeply_jwt_secure_secret_meta_2026_xyz"
-JWT_EXPIRES_IN="7d"
-CORS_ORIGIN="http://localhost:5173"
-
-# Meta AI Integration
-META_AI_API_KEY="your_meta_ai_api_key_here"
-META_AI_BASE_URL="https://api.meta.ai/v1"
-META_AI_MODEL="muse-spark-1.3-contributor"
-
-# Automation Engine & Webhooks
-N8N_BASE_URL="https://n8n-dev1.auto-node.tech"
-N8N_WORKFLOWS_URL="https://n8n-dev1.auto-node.tech/home/workflows"
-N8N_WEBHOOK_URL="https://n8n-dev1.auto-node.tech/webhook/sleeply-v2-chat-principal"
-N8N_API_KEY="your_n8n_api_key_here"
-
-# OpenClaw Local Gateway (Optional Fallback)
-OPENCLAW_BASE_URL="http://127.0.0.1:18789"
-OPENCLAW_TOKEN="your_openclaw_token_here"
-OPENCLAW_MODEL="openclaw"
-OPENCLAW_ENABLED=false
-```
-
----
-
 ## Installation & Setup
 
 ### 1. Database
