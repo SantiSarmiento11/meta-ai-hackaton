@@ -46,11 +46,7 @@ Thumbs.db
 skills-lock.json
 GEMINI.md
 
-# Documentación interna y especificaciones
-sleeply_especificaci_n_de_producto_y_arquitectura.md
-Sleeply — MVP Summary.md
-Sleeply - MVP Summary.md
-MULTI_AGENT_SKILLS_GUIDE.md
+# Documentacion interna y especificaciones
 docs/*
 !docs/github_sync_report.md
 !docs/google_drive_sleeply_deliverable.md

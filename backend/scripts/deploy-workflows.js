@@ -80,6 +80,10 @@ async function main() {
       file: path.join(__dirname, '../src/workflows/03-manager-nightly-monitor.json')
     },
     {
+      id: 'dQcgAMxGLkhwItEv',
+      file: path.join(__dirname, '../src/workflows/04-ceo-conversational-agent.json')
+    },
+    {
       id: 'Gq3g9wHoEZ6761Jz',
       file: path.join(__dirname, '../src/workflows/00-central-orchestrator.json')
     }

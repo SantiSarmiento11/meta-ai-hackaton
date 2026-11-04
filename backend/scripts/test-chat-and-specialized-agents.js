@@ -76,14 +76,20 @@ async function runTests() {
   const readmePath = path.join(__dirname, '../../README.md');
   const ghDocPath = path.join(__dirname, '../../docs/github_sync_report.md');
   const gdriveDocPath = path.join(__dirname, '../../docs/google_drive_sleeply_deliverable.md');
+  const mvpSummaryPath = path.join(__dirname, '../../Sleeply — MVP Summary.md');
+  const specArchPath = path.join(__dirname, '../../sleeply_especificaci_n_de_producto_y_arquitectura.md');
 
   const readmeContent = fs.readFileSync(readmePath, 'utf8');
   const ghContent = fs.readFileSync(ghDocPath, 'utf8');
   const gdriveContent = fs.readFileSync(gdriveDocPath, 'utf8');
+  const mvpContent = fs.readFileSync(mvpSummaryPath, 'utf8');
+  const specArchContent = fs.readFileSync(specArchPath, 'utf8');
 
   console.log('README.md tiene comentario de éxito?:', readmeContent.includes('Tarea terminada con éxito'));
   console.log('github_sync_report.md tiene comentario de éxito?:', ghContent.includes('Tarea terminada con éxito'));
   console.log('google_drive_sleeply_deliverable.md tiene comentario de éxito?:', gdriveContent.includes('Tarea terminada con éxito'));
+  console.log('Sleeply — MVP Summary.md tiene comentario de éxito?:', mvpContent.includes('Tarea terminada con éxito'));
+  console.log('sleeply_especificaci_n_de_producto_y_arquitectura.md tiene comentario de éxito?:', specArchContent.includes('Tarea terminada con éxito'));
 
   console.log('\n================================================================');
   console.log('TODAS LAS PRUEBAS COMPLETADAS EXITOSAMENTE');

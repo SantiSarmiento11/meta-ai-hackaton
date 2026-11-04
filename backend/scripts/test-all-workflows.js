@@ -120,9 +120,24 @@ async function main() {
   console.log('Orchestrator bubbleMessage:', res4.body?.bubbleMessage);
   console.log('Emojis detectados en respuesta:', checkEmojis(JSON.stringify(res4.body)));
 
+  // TEST 5: Agente Conversacional Principal (Alex Vance - CEO)
+  console.log('\n--- TEST 5: Agente Conversacional Principal (Alex Vance - CEO) ---');
+  const t5 = Date.now();
+  const res5 = await postWebhook('/webhook/sleeply-ceo-agent', {
+    agentCode: 'CEO',
+    message: 'Hola Alex, cuál es el estado general del equipo y las automatizaciones en n8n?',
+    operatingMode: 'awake'
+  });
+  console.log('HTTP Status:', res5.status, `(${Date.now() - t5}ms)`);
+  console.log('Agent Code:', res5.body?.agentCode);
+  console.log('Agent Name:', res5.body?.agentName);
+  console.log('Bubble Message:', res5.body?.bubbleMessage);
+  console.log('Emojis detectados en respuesta:', checkEmojis(JSON.stringify(res5.body)));
+  console.log('Meta AI Output snippet:', (res5.body?.output || '').slice(0, 200).replace(/\n/g, ' '));
+
   // Verificacion de ejecuciones en n8n
   console.log('\n--- VERIFICACION DE ULTIMAS EJECUCIONES EN N8N API ---');
-  const execs = await getRecentExecutions(8);
+  const execs = await getRecentExecutions(10);
   for (const item of execs.data) {
     console.log(`- ID: ${item.id} | Workflow: ${item.workflowId} | Status: ${item.status} | Mode: ${item.mode}`);
   }

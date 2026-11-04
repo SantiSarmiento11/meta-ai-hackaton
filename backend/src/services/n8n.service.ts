@@ -126,6 +126,11 @@ export class N8nService {
    * Dedicated webhook paths and workflow IDs for each agent role
    */
   public static readonly AGENT_WEBHOOKS: Record<string, { webhookPath: string; workflowId: string; name: string }> = {
+    CEO: {
+      webhookPath: '/webhook/sleeply-ceo-agent',
+      workflowId: 'dQcgAMxGLkhwItEv',
+      name: 'Alex Vance',
+    },
     ASSISTANT: {
       webhookPath: '/webhook/sleeply-secretary-agent',
       workflowId: 'OGiWBz0XS8YCKsV7',
@@ -162,7 +167,7 @@ export class N8nService {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 75000);
 
       const response = await fetch(targetUrl, {
         method: 'POST',
@@ -208,7 +213,7 @@ export class N8nService {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 75000);
 
       const response = await fetch(webhookUrl, {
         method: 'POST',

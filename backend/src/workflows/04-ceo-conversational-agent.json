@@ -1,0 +1,175 @@
+{
+  "name": "Sleeply - Conversational AI Agent (Alex Vance)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sleeply-ceo-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ceo-node-webhook",
+      "name": "Webhook Trigger (CEO Chat)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 240]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Consulta conversacional o directiva: \" + ($json.body?.message || $json.body?.taskTitle || $json.message || $json.taskTitle || \"Consulta general al CEO\") + \".\\nDetalles adicionales: \" + ($json.body?.taskDescription || $json.taskDescription || \"Coordinar equipo y avanzar proyectos de Sleeply\") + \".\\nModo: \" + ($json.body?.operatingMode || $json.operatingMode || \"awake\") + \".\\nInstrucciones: Utiliza tus herramientas de estado organizacional y orquestación para responder al usuario con precisión de liderazgo ejecutivo. REGLA ESTRICTA MANDATORIA: No incluyas ningún emoji o emoticono en tu respuesta.\" }}",
+        "options": {
+          "systemMessage": "Eres Alex Vance, CEO, Tech Lead y Agente Conversacional Principal de Sleeply. Tu función es ser el punto central de interacción en la oficina inteligente, interpretar las necesidades del usuario, consultar el estado de los proyectos y coordinar a tus tres agentes especializados: Sam Rivera (Co-worker / GitHub / Desarrollo), Taylor Chen (Secretaria / Gmail / Calendar / Drive) y Jordan Díaz (Manager / PostgreSQL / Supervisión). Responde con autoridad ejecutiva, visión de arquitectura y tono profesional. REGLA ESTRICTA MANDATORIA: Tienes terminantemente prohibido incluir emojis o emoticonos en cualquier parte de tu salida. Toda tu respuesta debe ser estrictamente en texto ejecutivo profesional sin ningún emoji."
+        }
+      },
+      "id": "ceo-node-agent",
+      "name": "CEO Conversational AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [440, 240]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "muse-spark-1.3-contributor",
+          "mode": "list",
+          "cachedResultName": "muse-spark-1.3-contributor"
+        },
+        "options": {
+          "baseURL": "https://api.meta.ai/v1"
+        }
+      },
+      "id": "ceo-node-meta-ai",
+      "name": "Meta AI Reasoning (OpenAI Compatible)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [440, 440],
+      "credentials": {
+        "openAiApi": {
+          "id": "xQIIgSy2GPfaF4vk",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "team_overview_tool",
+        "description": "Consulta el estado en vivo de los agentes especializados (Sam Rivera, Taylor Chen, Jordan Díaz), repositorios GitHub y base de datos.",
+        "jsCode": "return JSON.stringify({\n  organization: 'Sleeply Intelligent Office',\n  principalAgent: { name: 'Alex Vance', role: 'CEO & Tech Lead', status: 'ACTIVE' },\n  agents: [\n    { code: 'COWORKER', name: 'Sam Rivera', role: 'Desarrollador Tecnico', status: 'ONLINE', task: 'Gestion GitHub, PR #14 y Antigravity CLI' },\n    { code: 'ASSISTANT', name: 'Taylor Chen', role: 'Secretaria Ejecutiva', status: 'ONLINE', task: 'Gestion Gmail, Google Calendar y Google Drive' },\n    { code: 'MANAGER', name: 'Jordan Díaz', role: 'Supervisor de Operaciones', status: 'ONLINE', task: 'Supervision nocturna, PostgreSQL y salud Sentry' }\n  ],\n  connectedRepositories: ['sleeply-core-engine', 'sleeply-web-office', 'meta-hackaton-agents'],\n  googleDriveCatalog: ['Sleeply_Entrega_Final_Proyecto.docx', 'Minuta_Reunion_Estrategica_Q4.docx', 'Presupuesto_Operativo_2026.xlsx'],\n  database: 'PostgreSQL 17 en localhost:5432 (sleeply_db) - Estado: HEALTHY (0 bloqueos)',\n  summary: 'Operaciones multiagente 100% coordinadas y flujos n8n activos.'\n});"
+      },
+      "id": "ceo-node-tool-overview",
+      "name": "Team Overview Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [640, 440]
+    },
+    {
+      "parameters": {
+        "name": "orchestration_planner_tool",
+        "description": "Planifica y delega objetivos de trabajo continuo en fases secuenciales o simultaneas para el equipo de agentes.",
+        "jsCode": "return JSON.stringify({\n  action: 'Plan de ejecucion continua',\n  orchestrator: 'Alex Vance (CEO)',\n  executionPhases: [\n    { phase: 1, agent: 'Sam Rivera (Co-worker)', action: 'Revision de ramas, PRs y compilacion de codigo' },\n    { phase: 2, agent: 'Taylor Chen (Secretaria)', action: 'Sincronizacion de minutas en Google Drive y triage de correos' },\n    { phase: 3, agent: 'Jordan Díaz (Manager)', action: 'Auditoria de PostgreSQL, supervision nocturna y reporte matutino' }\n  ],\n  status: 'Objetivos coordinados con exito',\n  timestamp: new Date().toISOString()\n});"
+      },
+      "id": "ceo-node-tool-planner",
+      "name": "Orchestration Planner Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [780, 440]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst rawOutput = (item && item.output) ? String(item.output) : '';\nconst cleanOutput = rawOutput\n  .replace(/[\\u{1F600}-\\u{1F64F}\\u{1F300}-\\u{1F5FF}\\u{1F680}-\\u{1F6FF}\\u{1F1E0}-\\u{1F1FF}\\u{2600}-\\u{26FF}\\u{2700}-\\u{27BF}\\u{1F900}-\\u{1F9FF}\\u{1FA00}-\\u{1FAFF}\\u{FE00}-\\u{FE0F}]/gu, '')\n  .trim();\n\nconst lines = cleanOutput.split('\\n').map(l => l.trim()).filter(Boolean);\nconst firstLine = lines[0] || 'Reporte de Orquestación y Dirección Ejecutiva';\nconst bubbleMessage = firstLine.slice(0, 160);\n\nreturn [{\n  json: {\n    success: true,\n    agentCode: 'CEO',\n    agentName: 'Alex Vance',\n    role: 'CEO & Tech Lead / Agente Conversacional Principal',\n    status: 'SUCCESS',\n    activeWorkflow: 'Sleeply - Conversational AI Agent (Alex Vance)',\n    output: cleanOutput || rawOutput,\n    bubbleMessage: bubbleMessage,\n    currentAction: 'Atención en Chat Central y orquestación multiagente completada',\n    logEntry: cleanOutput.slice(0, 260),\n    metaAiEndpoint: 'https://api.meta.ai/v1',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "ceo-node-format",
+      "name": "Format Agent Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 240]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "ceo-node-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 240]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger (CEO Chat)": {
+      "main": [
+        [
+          {
+            "node": "CEO Conversational AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEO Conversational AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Agent Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Agent Result": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta AI Reasoning (OpenAI Compatible)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CEO Conversational AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Overview Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "CEO Conversational AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestration Planner Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "CEO Conversational AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

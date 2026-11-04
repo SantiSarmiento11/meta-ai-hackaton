@@ -31,14 +31,14 @@ class AgentActivityService {
       role: 'CEO & Tech Lead',
       avatar: 'char_0',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Central Agent Orchestrator',
-      workflowId: 'orch-central-001',
+      activeWorkflow: 'Sleeply - Conversational AI Agent (Alex Vance)',
+      workflowId: 'dQcgAMxGLkhwItEv',
       currentAction: 'Dirección general y orquestación estratégica',
       bubbleMessage: 'Oficina conectada: Supervisión y arquitectura activas',
       metaAiEndpoint: 'https://api.meta.ai/v1',
       lastUpdated: new Date().toISOString(),
       recentLogs: [
-        'Conectado al workflow Central Agent Orchestrator en n8n',
+        'Conectado al workflow Central Agent Orchestrator y Conversational AI Agent en n8n',
         'Modelo Meta AI (https://api.meta.ai/v1) inicializado',
         'Supervisión y ruteo estratégico de tareas activo',
       ],
@@ -257,7 +257,8 @@ class AgentActivityService {
 
   /**
    * Principal Conversational AI Agent (Alex Vance / CEO) Chat Endpoint
-   * Routes user natural language requests to the appropriate specialized agent or responds directly.
+   * Sends user natural language requests to the n8n Central Agent Orchestrator,
+   * which coordinates execution with Meta AI across the multi-agent system.
    */
   public async chatWithPrincipalAgent(payload: {
     message: string;
@@ -272,76 +273,115 @@ class AgentActivityService {
     actionTaken?: string;
     timestamp: string;
   }> {
-    const text = (payload.message || '').toLowerCase();
-    let targetCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' = 'CEO';
+    const ceoState = this.agentStates.get('CEO')!;
+    ceoState.status = 'WORKING';
+    ceoState.currentAction = `Procesando consulta: ${payload.message.slice(0, 50)}`;
+    ceoState.bubbleMessage = `Orquestando solicitud: "${payload.message.slice(0, 40)}"`;
+    ceoState.lastUpdated = new Date().toISOString();
 
-    if (
-      text.includes('github') ||
-      text.includes('repo') ||
-      text.includes('rama') ||
-      text.includes('código') ||
-      text.includes('pr') ||
-      text.includes('commit') ||
-      text.includes('test') ||
-      text.includes('sam')
-    ) {
-      targetCode = 'COWORKER';
-    } else if (
-      text.includes('correo') ||
-      text.includes('email') ||
-      text.includes('gmail') ||
-      text.includes('calendar') ||
-      text.includes('agenda') ||
-      text.includes('drive') ||
-      text.includes('minuta') ||
-      text.includes('taylor') ||
-      text.includes('secretaria')
-    ) {
-      targetCode = 'ASSISTANT';
-    } else if (
-      text.includes('manager') ||
-      text.includes('jordan') ||
-      text.includes('salud') ||
-      text.includes('sentry') ||
-      text.includes('postgres') ||
-      text.includes('reporte') ||
-      text.includes('supervisión') ||
-      text.includes('auditor') ||
-      text.includes('noche') ||
-      text.includes('sueño')
-    ) {
-      targetCode = 'MANAGER';
-    }
+    // Disparar flujo al Orquestador Central de n8n
+    const dispatchResult = await n8nService.dispatchToN8n({
+      userId: payload.userId || 'system_operator',
+      userEmail: 'operator@sleeply.local',
+      agentCode: 'CEO',
+      agentName: 'Alex Vance',
+      taskTitle: payload.message.slice(0, 80),
+      taskDescription: payload.message,
+      operatingMode: 'awake',
+      timestamp: new Date().toISOString(),
+    });
 
-    // If delegated to specialized agent, trigger their n8n workflow
-    if (targetCode !== 'CEO') {
-      const exec = await this.executeAgentAction(
-        targetCode,
-        payload.message.slice(0, 100),
-        payload.userId
-      );
-      const state = exec.state;
+    const resBody = dispatchResult.responseBody;
+    if (dispatchResult.dispatched && resBody?.success) {
+      const respondingCode = (resBody.agentCode || 'CEO').toUpperCase() as 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+      const respondingState = this.agentStates.get(respondingCode) || ceoState;
+
+      respondingState.status = 'SUCCESS';
+      if (resBody.bubbleMessage) respondingState.bubbleMessage = resBody.bubbleMessage;
+      if (resBody.currentAction) respondingState.currentAction = resBody.currentAction;
+      respondingState.lastUpdated = new Date().toISOString();
+      respondingState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] ${resBody.bubbleMessage || 'Consulta atendida'}`);
+      if (respondingState.recentLogs.length > 8) respondingState.recentLogs.pop();
+
+      if (respondingCode !== 'CEO') {
+        ceoState.status = 'SUCCESS';
+        ceoState.bubbleMessage = `Instrucción orquestada hacia ${respondingState.name}`;
+        ceoState.currentAction = `Delegó tarea a ${respondingState.name}`;
+        ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Delegó a ${respondingState.name} (${respondingState.activeWorkflow})`);
+        if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
+      } else {
+        ceoState.status = 'SUCCESS';
+        ceoState.bubbleMessage = resBody.bubbleMessage || 'Reporte de orquestación central emitido';
+        ceoState.currentAction = 'Atención en Chat Central completada';
+      }
+
+      // Persistir en PostgreSQL si userId está disponible
+      if (payload.userId) {
+        try {
+          const agent = await prisma.agent.findFirst({
+            where: { userId: payload.userId, code: respondingCode as any },
+          });
+          if (agent) {
+            const task = await prisma.task.create({
+              data: {
+                userId: payload.userId,
+                agentId: agent.id,
+                title: payload.message.slice(0, 100),
+                description: `Chat conversacional orquestado para ${respondingState.name}`,
+                status: 'COMPLETED',
+                result: JSON.stringify(resBody),
+              },
+            });
+            await prisma.taskExecutionLog.create({
+              data: {
+                taskId: task.id,
+                status: 'SUCCESS',
+                message: `Orquestado exitosamente con Meta AI (${resBody.activeWorkflow || respondingState.activeWorkflow})`,
+                rawPayload: resBody as any,
+              },
+            });
+          }
+        } catch (dbErr: any) {
+          console.warn('[chatWithPrincipalAgent DB Log Error]:', dbErr.message);
+        }
+      }
+
+      const actionTaken = respondingCode === 'CEO'
+        ? 'Orquestación general procesada'
+        : `Delegado a ${respondingState.name} (${respondingState.activeWorkflow})`;
+
       return {
         success: true,
-        reply: exec.result.metaAiResponse || exec.result.bubbleMessage || 'Acción completada con éxito.',
-        agentCode: targetCode,
-        agentName: state.name,
-        agentRole: state.role,
-        avatar: state.avatar,
-        actionTaken: `Delegado a ${state.name} (${state.activeWorkflow})`,
-        timestamp: new Date().toISOString(),
+        reply: resBody.output || resBody.bubbleMessage || 'Instrucción procesada con éxito.',
+        agentCode: respondingCode,
+        agentName: respondingState.name,
+        agentRole: respondingState.role,
+        avatar: respondingState.avatar,
+        actionTaken,
+        timestamp: resBody.timestamp || new Date().toISOString(),
       };
     }
 
-    // Direct CEO Response (Alex Vance)
-    const ceoState = this.agentStates.get('CEO')!;
+    // Fallback resiliente si n8n no responde o hay fallo de red
+    const text = (payload.message || '').toLowerCase();
+    let fallbackCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' = 'CEO';
+    if (text.includes('github') || text.includes('repo') || text.includes('rama') || text.includes('código') || text.includes('pr') || text.includes('commit') || text.includes('test') || text.includes('sam')) {
+      fallbackCode = 'COWORKER';
+    } else if (text.includes('correo') || text.includes('email') || text.includes('gmail') || text.includes('calendar') || text.includes('agenda') || text.includes('drive') || text.includes('minuta') || text.includes('taylor') || text.includes('secretaria')) {
+      fallbackCode = 'ASSISTANT';
+    } else if (text.includes('manager') || text.includes('jordan') || text.includes('salud') || text.includes('sentry') || text.includes('postgres') || text.includes('reporte') || text.includes('noche') || text.includes('sueño')) {
+      fallbackCode = 'MANAGER';
+    }
+
+    const fallbackAgent = this.agentStates.get(fallbackCode) || ceoState;
+    ceoState.status = 'SUCCESS';
     ceoState.bubbleMessage = 'Coordinación central: Supervisión activa de equipo y flujos n8n';
     ceoState.currentAction = 'Atendiendo consulta en Chat Central de Oficina';
     ceoState.lastUpdated = new Date().toISOString();
     ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Consulta en Chat: "${payload.message.slice(0, 50)}"`);
     if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
 
-    const reply =
+    const fallbackReply =
       `Reporte de Orquestación Central (Alex Vance - CEO & Tech Lead):\n` +
       `He recibido tu instrucción: "${payload.message}".\n\n` +
       `Estado actual del equipo multiagente y conexiones n8n:\n` +
@@ -352,12 +392,12 @@ class AgentActivityService {
 
     return {
       success: true,
-      reply,
+      reply: fallbackReply,
       agentCode: 'CEO',
       agentName: ceoState.name,
       agentRole: ceoState.role,
       avatar: ceoState.avatar,
-      actionTaken: 'Orquestación general procesada',
+      actionTaken: 'Orquestación general procesada (modo local)',
       timestamp: new Date().toISOString(),
     };
   }

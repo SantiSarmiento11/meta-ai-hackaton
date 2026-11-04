@@ -110,14 +110,11 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
     if (!isOpen) return;
     let isCancelled = false;
 
+    const targetCode = initialAgentCode || 'COWORKER';
+    setSelectedAgentCode(targetCode);
+    setActiveTab('agents');
+
     const runInitialSync = async () => {
-      await Promise.resolve();
-      if (isCancelled) return;
-
-      const code = initialAgentCode || selectedAgentCode || 'COWORKER';
-      setSelectedAgentCode(code);
-      setActiveTab('agents');
-
       setIsLoading(true);
       setError(null);
       try {
@@ -142,7 +139,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         }
       }
 
-      loadSpecializedData(code);
+      loadSpecializedData(targetCode);
     };
 
     runInitialSync();
@@ -150,7 +147,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [isOpen, initialAgentCode, gameInstance, loadSpecializedData, selectedAgentCode]);
+  }, [isOpen, initialAgentCode, gameInstance, loadSpecializedData]);
 
   // Trigger custom action or specialized action
   const handleRunSpecializedAction = async (actionType: string, customText?: string) => {
