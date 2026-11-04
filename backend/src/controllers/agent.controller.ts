@@ -149,3 +149,157 @@ export const updateAgent = async (req: AuthRequest, res: Response): Promise<void
     });
   }
 };
+
+export const chatWithPrincipalAgent = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { message } = req.body;
+    const userId = req.user?.id;
+
+    if (!message || typeof message !== 'string') {
+      res.status(400).json({ success: false, error: 'Mensaje es requerido' });
+      return;
+    }
+
+    const result = await agentActivityService.chatWithPrincipalAgent({
+      message,
+      userId,
+    });
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    console.error('[ChatWithPrincipalAgent Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al procesar mensaje con el agente principal: ' + error.message,
+    });
+  }
+};
+
+export const getCoworkerRepositories = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const repositories = agentActivityService.getCoworkerRepositories();
+    res.status(200).json({
+      success: true,
+      repositories,
+    });
+  } catch (error: any) {
+    console.error('[GetCoworkerRepositories Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener repositorios de GitHub: ' + error.message,
+    });
+  }
+};
+
+export const executeCoworkerRepoAction = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { repoName, actionType, customInstruction } = req.body;
+    const userId = req.user?.id;
+
+    if (!repoName || !actionType) {
+      res.status(400).json({ success: false, error: 'repoName y actionType son requeridos' });
+      return;
+    }
+
+    const result = await agentActivityService.executeCoworkerRepoAction({
+      repoName,
+      actionType,
+      customInstruction,
+      userId,
+    });
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    console.error('[ExecuteCoworkerRepoAction Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al ejecutar acción de GitHub: ' + error.message,
+    });
+  }
+};
+
+export const getSecretaryDriveFiles = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const data = agentActivityService.getSecretaryDriveFiles();
+    res.status(200).json({
+      success: true,
+      ...data,
+    });
+  } catch (error: any) {
+    console.error('[GetSecretaryDriveFiles Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener archivos de Google Drive: ' + error.message,
+    });
+  }
+};
+
+export const executeSecretaryDriveAction = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { docId, actionType, customInstruction } = req.body;
+    const userId = req.user?.id;
+
+    if (!actionType) {
+      res.status(400).json({ success: false, error: 'actionType es requerido' });
+      return;
+    }
+
+    const result = await agentActivityService.executeSecretaryDriveAction({
+      docId,
+      actionType,
+      customInstruction,
+      userId,
+    });
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    console.error('[ExecuteSecretaryDriveAction Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al ejecutar acción de Secretaria/Drive: ' + error.message,
+    });
+  }
+};
+
+export const getManagerSystemHealth = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const data = agentActivityService.getManagerSystemHealth();
+    res.status(200).json({
+      success: true,
+      ...data,
+    });
+  } catch (error: any) {
+    console.error('[GetManagerSystemHealth Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener salud del sistema: ' + error.message,
+    });
+  }
+};
+
+export const executeManagerAction = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { actionType, customInstruction } = req.body;
+    const userId = req.user?.id;
+
+    if (!actionType) {
+      res.status(400).json({ success: false, error: 'actionType es requerido' });
+      return;
+    }
+
+    const result = await agentActivityService.executeManagerAuditAction({
+      actionType,
+      customInstruction,
+      userId,
+    });
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    console.error('[ExecuteManagerAction Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al ejecutar acción de Manager: ' + error.message,
+    });
+  }
+};
+

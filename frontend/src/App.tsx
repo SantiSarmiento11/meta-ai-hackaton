@@ -5,10 +5,27 @@ import { ObjectCatalogDrawer } from './components/ObjectCatalogDrawer';
 import { CharacterSelectModal } from './components/CharacterSelectModal';
 import { AuthModal } from './components/AuthModal';
 import { N8nStatusModal } from './components/N8nStatusModal';
+import { OfficeChatModal } from './components/OfficeChatModal';
 import type { MainScene, OperatingMode } from './game/scenes/MainScene';
-import { getCharacterById, type CharacterId } from './game/models/CharacterModel';
+import { type CharacterId } from './game/models/CharacterModel';
 import { api, type User } from './services/api';
 import sleeplyLogo from './assets/sleeply (svg).svg';
+import {
+  PowerIcon,
+  SpinnerIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  FurnitureIcon,
+  ChatIcon,
+  SunIcon,
+  MoonIcon,
+  PinIcon,
+  MoveIcon,
+  TrashIcon,
+  CloseIcon,
+  AlertTriangleIcon,
+  InfoIcon,
+} from './components/Icons';
 import './App.css';
 
 interface ActivePlacingState {
@@ -40,26 +57,24 @@ function App() {
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [currentZoom, setCurrentZoom] = useState<number>(1.0);
 
-  // Object Placement & Selection State
+  // Furniture Mode State
+  const [isFurnitureMode, setIsFurnitureMode] = useState<boolean>(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState<boolean>(false);
   const [activePlacing, setActivePlacing] = useState<ActivePlacingState | null>(null);
   const [selectedObject, setSelectedObject] = useState<SelectedObjectState | null>(null);
-  const [isPhysicsDebug, setIsPhysicsDebug] = useState<boolean>(false);
 
-  // Character Selection State
+  // Character State
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId | null>(null);
   const [isCharacterModalOpen, setIsCharacterModalOpen] = useState<boolean>(false);
-  const [showMovementHint, setShowMovementHint] = useState<boolean>(false);
 
   // Authentication & Persistence State
   const [currentUser, setCurrentUser] = useState<User | null>(() => api.getStoredUser());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(() => !api.isAuthenticated());
   const [isN8nModalOpen, setIsN8nModalOpen] = useState<boolean>(false);
-  const [selectedAgentCode, setSelectedAgentCode] = useState<'ASSISTANT' | 'COWORKER' | 'MANAGER' | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [selectedAgentCode, setSelectedAgentCode] = useState<'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO' | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [toast, setToast] = useState<ToastState | null>(null);
-
-  const selectedCharacter = selectedCharacterId ? getCharacterById(selectedCharacterId) : null;
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
@@ -92,18 +107,14 @@ function App() {
         setCurrentZoom(office.zoomLevel);
       }
 
-      // Sync grid visibility
-      if (typeof office.isGridVisible === 'boolean') {
-        scene.setGridVisible(office.isGridVisible);
-        setIsGridVisible(office.isGridVisible);
-      }
+      // Grid is kept OFF by default outside furniture mode
+      scene.setGridVisible(false);
+      setIsGridVisible(false);
 
       // Sync player avatar
-      if (office.selectedAvatarId) {
-        const charId = office.selectedAvatarId as CharacterId;
-        setSelectedCharacterId(charId);
-        scene.spawnPlayer(charId);
-      }
+      const charId = (office.selectedAvatarId as CharacterId) || 'char_0';
+      setSelectedCharacterId(charId);
+      scene.spawnPlayer(charId);
 
       // Sync placed furniture objects
       const objManager = scene.getObjectManager();
@@ -114,7 +125,7 @@ function App() {
         });
       }
 
-      // Sync and spawn live agents with speech bubbles in the office
+      // Sync and spawn live agents
       try {
         const agentStates = await api.getAgentActivity();
         scene.getAgentManager()?.spawnAllAgents(agentStates);
@@ -136,15 +147,15 @@ function App() {
   const handleSceneReady = useCallback((scene: MainScene) => {
     setSceneInstance(scene);
     setOperatingMode(scene.getCurrentMode());
-    setIsGridVisible(scene.isGridVisible());
+    // Initial state: grid is off outside furniture mode
+    scene.setGridVisible(false);
+    setIsGridVisible(false);
     setCurrentZoom(scene.getZoom());
-    setIsPhysicsDebug(scene.isPhysicsDebug());
 
     if (api.isAuthenticated() && currentUser) {
       scene.setInputEnabled(true);
       loadOfficeFromBackend(scene);
     } else {
-      // Strictly prevent unauthenticated visitors from interacting or moving
       scene.setInputEnabled(false);
       setIsAuthModalOpen(true);
     }
@@ -157,17 +168,12 @@ function App() {
     if (sceneInstance) {
       sceneInstance.spawnPlayer(charId);
     }
-
-    setShowMovementHint(true);
-    setTimeout(() => {
-      setShowMovementHint(false);
-    }, 7000);
   }, [sceneInstance]);
 
   const handleLoginSuccess = useCallback((user: User) => {
     setCurrentUser(user);
     setIsAuthModalOpen(false);
-    showToast(`¡Bienvenido ${user.name}! Sesión iniciada con éxito.`, 'success');
+    showToast(`Bienvenido ${user.name}. Sesión iniciada con éxito.`, 'success');
 
     if (sceneInstance) {
       sceneInstance.setInputEnabled(true);
@@ -178,9 +184,13 @@ function App() {
   const handleLogout = useCallback(() => {
     api.logout();
     setCurrentUser(null);
+    setIsFurnitureMode(false);
+    setIsCatalogOpen(false);
     setIsAuthModalOpen(true);
     if (sceneInstance) {
       sceneInstance.setInputEnabled(false);
+      sceneInstance.setGridVisible(false);
+      setIsGridVisible(false);
       const player = sceneInstance.getPlayer();
       if (player) {
         player.setVelocity(0, 0);
@@ -221,7 +231,7 @@ function App() {
       });
 
       setSaveStatus('saved');
-      showToast('Oficina y mobiliario guardados exitosamente en PostgreSQL', 'success');
+      showToast('Mobiliario guardado exitosamente en PostgreSQL', 'success');
       setTimeout(() => setSaveStatus('idle'), 2500);
     } catch (err: any) {
       setSaveStatus('error');
@@ -249,21 +259,29 @@ function App() {
     const handlePlacementStarted = (data: ActivePlacingState) => {
       setActivePlacing(data);
       setIsCatalogOpen(false);
+      // Grid is active during placement
+      sceneInstance?.setGridVisible(true);
+      setIsGridVisible(true);
     };
 
     const handlePlacementEnded = () => {
       setActivePlacing(null);
+      // Maintain grid and reopen catalog if still in furniture mode
+      if (isFurnitureMode) {
+        sceneInstance?.setGridVisible(true);
+        setIsGridVisible(true);
+        setIsCatalogOpen(true);
+      } else {
+        sceneInstance?.setGridVisible(false);
+        setIsGridVisible(false);
+      }
     };
 
     const handleObjectSelected = (data: SelectedObjectState | null) => {
       setSelectedObject(data);
     };
 
-    const handlePhysicsDebugToggled = (active: boolean) => {
-      setIsPhysicsDebug(active);
-    };
-
-    const handleAgentSelected = (code: 'ASSISTANT' | 'COWORKER' | 'MANAGER') => {
+    const handleAgentSelected = (code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO') => {
       setSelectedAgentCode(code);
       setIsN8nModalOpen(true);
     };
@@ -275,7 +293,6 @@ function App() {
     gameInstance.events.on('placement-mode-started', handlePlacementStarted);
     gameInstance.events.on('placement-mode-ended', handlePlacementEnded);
     gameInstance.events.on('object-selected', handleObjectSelected);
-    gameInstance.events.on('physics-debug-toggled', handlePhysicsDebugToggled);
     gameInstance.events.on('agent-selected', handleAgentSelected);
 
     return () => {
@@ -286,20 +303,14 @@ function App() {
       gameInstance.events.off('placement-mode-started', handlePlacementStarted);
       gameInstance.events.off('placement-mode-ended', handlePlacementEnded);
       gameInstance.events.off('object-selected', handleObjectSelected);
-      gameInstance.events.off('physics-debug-toggled', handlePhysicsDebugToggled);
       gameInstance.events.off('agent-selected', handleAgentSelected);
     };
-  }, [gameInstance]);
+  }, [gameInstance, isFurnitureMode, sceneInstance]);
 
   const toggleMode = () => {
     if (!gameInstance || isTransitioning) return;
     setIsTransitioning(true);
     gameInstance.events.emit('request-toggle-mode');
-  };
-
-  const toggleGrid = () => {
-    if (!gameInstance) return;
-    gameInstance.events.emit('request-toggle-grid');
   };
 
   const zoomIn = () => {
@@ -317,18 +328,57 @@ function App() {
     gameInstance.events.emit('request-zoom-reset');
   };
 
+  // Enter Furniture Mode & Catalog Menu
+  const handleToggleFurnitureMode = () => {
+    setIsFurnitureMode(true);
+    setIsCatalogOpen(true);
+    sceneInstance?.setGridVisible(true);
+    setIsGridVisible(true);
+  };
+
   const handleStartPlacement = (objectId: string) => {
     if (!gameInstance) return;
+    sceneInstance?.setGridVisible(true);
+    setIsGridVisible(true);
     gameInstance.events.emit('request-start-placement', objectId);
   };
 
   const handleCancelPlacement = () => {
     if (!gameInstance) return;
     gameInstance.events.emit('request-cancel-placement');
+    if (isFurnitureMode) {
+      sceneInstance?.setGridVisible(true);
+      setIsGridVisible(true);
+      setIsCatalogOpen(true);
+    } else {
+      sceneInstance?.setGridVisible(false);
+      setIsGridVisible(false);
+    }
+  };
+
+  // Finish furniture mode / confirm ready and persist to PostgreSQL
+  const handleFinishDesign = async () => {
+    if (activePlacing) {
+      handleCancelPlacement();
+    }
+    if (selectedObject) {
+      handleDeselect();
+    }
+    sceneInstance?.setGridVisible(false);
+    setIsGridVisible(false);
+    setIsCatalogOpen(false);
+
+    try {
+      await handleSaveOffice();
+    } finally {
+      setIsFurnitureMode(false);
+    }
   };
 
   const handleMoveSelected = () => {
     if (!gameInstance) return;
+    sceneInstance?.setGridVisible(true);
+    setIsGridVisible(true);
     gameInstance.events.emit('request-move-selected');
   };
 
@@ -341,16 +391,15 @@ function App() {
     if (!gameInstance) return;
     gameInstance.events.emit('request-start-placement', '');
     sceneInstance?.getObjectManager()?.selectObject(null);
+    if (!isFurnitureMode) {
+      sceneInstance?.setGridVisible(false);
+      setIsGridVisible(false);
+    }
   };
 
   const handleClearAll = () => {
     if (!gameInstance) return;
     gameInstance.events.emit('request-clear-all');
-  };
-
-  const handleTogglePhysicsDebug = () => {
-    if (!gameInstance) return;
-    gameInstance.events.emit('request-toggle-physics-debug');
   };
 
   return (
@@ -360,7 +409,7 @@ function App() {
         onSceneReady={handleSceneReady}
       />
 
-      {/* Floating HUD with Sleeply Blue Design System (Only accessible once authenticated) */}
+      {/* Floating HUD Overlay */}
       {currentUser && (
         <header className="minimal-hud" role="region" aria-label="Controles del entorno">
           <div className="brand-container">
@@ -369,104 +418,64 @@ function App() {
               alt="Sleeply"
               className="brand-logo-white"
             />
-
-            <div className="hud-user-section" style={{ marginLeft: 16 }}>
-              <div className="user-profile-badge" title={currentUser.email}>
-                <span className="user-role-tag">{currentUser.role || 'CEO'}</span>
-                <span className="user-name-text">{currentUser.name}</span>
-              </div>
-              <button
-                type="button"
-                className="hud-logout-btn auth-scale-button"
-                onClick={handleLogout}
-                title="Cerrar sesión"
-                aria-label="Cerrar sesión"
-              >
-                ⏻
-              </button>
-            </div>
+            <button
+              type="button"
+              className="brand-logout-btn auth-scale-button"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+            >
+              <PowerIcon size={18} />
+            </button>
           </div>
 
           <nav className="hud-actions" aria-label="Acciones principales">
-            {/* n8n Automation Status Modal Trigger */}
-            <button
-              type="button"
-              className="hud-pill-button n8n-btn"
-              onClick={() => setIsN8nModalOpen(true)}
-              title="Ver panel de orquestación multi-agente, workflows en n8n y Meta AI"
-            >
-              <span className="btn-icon">⚡</span>
-              <span className="btn-label">Agentes & n8n</span>
-            </button>
+            {/* Únicamente cuando se esté editando aparece un solo botón de terminado con un chulito */}
+            {isFurnitureMode ? (
+              <button
+                type="button"
+                className="hud-pill-button done-btn auth-scale-button"
+                onClick={handleFinishDesign}
+                disabled={saveStatus === 'saving'}
+                title="Terminar y guardar cambios de mobiliario"
+              >
+                <span className="btn-icon">
+                  {saveStatus === 'saving' ? (
+                    <SpinnerIcon size={16} />
+                  ) : (
+                    <CheckIcon size={16} />
+                  )}
+                </span>
+                <span className="btn-label">
+                  {saveStatus === 'saving' ? 'Guardando...' : 'Terminado'}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="hud-pill-button catalog-btn"
+                onClick={handleToggleFurnitureMode}
+                title="Editar mobiliario de la oficina"
+              >
+                <span className="btn-icon">
+                  <FurnitureIcon size={16} />
+                </span>
+                <span className="btn-label">Mobiliario</span>
+              </button>
+            )}
 
-            {/* Save Office Button */}
+            {/* Principal Agent Chat Button */}
             <button
               type="button"
-              className={`hud-pill-button save-btn ${saveStatus === 'saved' ? 'saved' : ''}`}
-              onClick={handleSaveOffice}
-              disabled={!sceneInstance || saveStatus === 'saving'}
-              title="Guardar oficina actual y mobiliario en la base de datos PostgreSQL"
+              className={`hud-pill-button chat-btn ${isChatOpen ? 'active' : ''}`}
+              onClick={() => setIsChatOpen((prev) => !prev)}
+              title="Abrir Chat con Agente Principal (Alex Vance)"
+              aria-label="Abrir Chat con Agente Principal"
             >
-              <span className="btn-icon">{saveStatus === 'saving' ? '⏳' : saveStatus === 'saved' ? '✓' : '💾'}</span>
-              <span className="btn-label">
-                {saveStatus === 'saving'
-                  ? 'Guardando...'
-                  : saveStatus === 'saved'
-                  ? '¡Guardado!'
-                  : 'Guardar'}
+              <span className="btn-icon">
+                <ChatIcon size={16} />
               </span>
-            </button>
-
-            {/* Character Switcher */}
-            <button
-              type="button"
-              className="hud-pill-button character-selector-btn"
-              onClick={() => setIsCharacterModalOpen(true)}
-              disabled={!sceneInstance}
-              title="Elegir o cambiar personaje para recorrer la oficina"
-              aria-label="Seleccionar personaje"
-            >
-              {selectedCharacter ? (
-                <>
-                  <img
-                    src={selectedCharacter.avatarUrl}
-                    alt={selectedCharacter.name}
-                    className="hud-avatar-thumb"
-                  />
-                  <span className="btn-label">{selectedCharacter.name.split(' ')[0]}</span>
-                </>
-              ) : (
-                <>
-                  <span className="btn-icon">👤</span>
-                  <span className="btn-label">Personaje</span>
-                </>
-              )}
-            </button>
-
-            {/* Furniture Catalog */}
-            <button
-              type="button"
-              className={`hud-pill-button catalog-btn ${isCatalogOpen ? 'active' : ''}`}
-              onClick={() => setIsCatalogOpen((prev) => !prev)}
-              disabled={!sceneInstance}
-              title="Abrir catálogo unificado de 160 objetos de oficina para colocar en el entorno"
-              aria-expanded={isCatalogOpen}
-            >
-              <span className="btn-icon">🪑</span>
-              <span className="btn-label">Mobiliario</span>
-            </button>
-
-            {/* Physics Debug */}
-            <button
-              type="button"
-              className={`hud-pill-button physics-btn ${isPhysicsDebug ? 'active' : ''}`}
-              onClick={handleTogglePhysicsDebug}
-              disabled={!sceneInstance}
-              title="Alternar visualización de cajas de colisión Phaser Arcade Physics"
-              aria-pressed={isPhysicsDebug}
-            >
-              <span className="btn-icon">⚡</span>
-              <span className="btn-label">{isPhysicsDebug ? 'Físicas ON' : 'Físicas'}</span>
+              <span className="btn-label">Chat Agente Principal</span>
             </button>
 
             {/* Zoom Controls */}
@@ -475,7 +484,7 @@ function App() {
                 type="button"
                 className="hud-pill-button zoom-btn"
                 onClick={zoomOut}
-                disabled={!sceneInstance || currentZoom <= 0.75}
+                disabled={currentZoom <= 0.75}
                 title="Alejar vista (Zoom-out)"
                 aria-label="Alejar vista"
               >
@@ -485,7 +494,7 @@ function App() {
                 type="button"
                 className="hud-pill-button zoom-level-btn"
                 onClick={resetZoom}
-                disabled={!sceneInstance || currentZoom === 1.0}
+                disabled={currentZoom === 1.0}
                 title="Restablecer zoom al 100%"
                 aria-label="Restablecer zoom"
               >
@@ -495,7 +504,7 @@ function App() {
                 type="button"
                 className="hud-pill-button zoom-btn"
                 onClick={zoomIn}
-                disabled={!sceneInstance || currentZoom >= 1.45}
+                disabled={currentZoom >= 1.45}
                 title="Acercar vista (Zoom-in)"
                 aria-label="Acercar vista"
               >
@@ -503,28 +512,17 @@ function App() {
               </button>
             </div>
 
-            {/* Grid Toggle */}
-            <button
-              type="button"
-              className={`hud-pill-button grid-btn ${isGridVisible ? 'active' : ''}`}
-              onClick={toggleGrid}
-              disabled={!sceneInstance}
-              aria-pressed={isGridVisible}
-              title="Alternar visibilidad de la cuadrícula isométrica 20x20 del piso"
-            >
-              <span className="btn-icon">#</span>
-              <span className="btn-label">Cuadrícula</span>
-            </button>
-
             {/* Mode Switcher */}
             <button
               type="button"
               className={`hud-pill-button mode-btn ${operatingMode === 'night' ? 'night' : 'day'}`}
               onClick={toggleMode}
-              disabled={!sceneInstance || isTransitioning}
+              disabled={isTransitioning}
               aria-label="Alternar entre modo día y noche"
             >
-              <span className="btn-icon">{operatingMode === 'day' ? '☾' : '☼'}</span>
+              <span className="btn-icon">
+                {operatingMode === 'day' ? <MoonIcon size={16} /> : <SunIcon size={16} />}
+              </span>
               <span className="btn-label">
                 {isTransitioning
                   ? 'Cambiando...'
@@ -565,7 +563,9 @@ function App() {
       {selectedObject && !activePlacing && (
         <section className="selected-object-bar" aria-label="Acciones de objeto seleccionado">
           <div className="selected-info">
-            <span className="selected-icon">📍</span>
+            <span className="selected-icon">
+              <PinIcon size={15} />
+            </span>
             <span className="selected-name">{selectedObject.name}</span>
             <span className="selected-coords">
               [{selectedObject.col}, {selectedObject.row}] ({selectedObject.footprint.width}x
@@ -580,7 +580,8 @@ function App() {
               onClick={handleMoveSelected}
               title="Mover este objeto a otra casilla"
             >
-              🔄 Mover
+              <MoveIcon size={14} />
+              <span>Mover</span>
             </button>
             <button
               type="button"
@@ -588,7 +589,8 @@ function App() {
               onClick={handleRemoveSelected}
               title="Eliminar este objeto (Supr)"
             >
-              🗑 Eliminar
+              <TrashIcon size={14} />
+              <span>Eliminar</span>
             </button>
             <button
               type="button"
@@ -596,7 +598,7 @@ function App() {
               onClick={handleDeselect}
               title="Deseleccionar"
             >
-              ✕
+              <CloseIcon size={14} />
             </button>
           </div>
         </section>
@@ -605,38 +607,26 @@ function App() {
       {/* Toast Notification */}
       {toast && (
         <div className={`sync-status-toast ${toast.type}`} role="status">
-          <span>{toast.type === 'success' ? '✓' : toast.type === 'error' ? '⚠' : 'ℹ'}</span>
-          <span>{toast.message}</span>
-        </div>
-      )}
-
-      {/* Movement Instruction Toast */}
-      {showMovementHint && (
-        <div className="movement-hint-toast" role="status" aria-live="polite">
-          <span className="hint-icon">🚶</span>
-          <span>
-            <strong>¡Personaje listo!</strong> Usa <code>WASD</code> o <code>Flechas</code> para caminar, o <strong>haz clic</strong> en el piso.
+          <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+            {toast.type === 'success' ? (
+              <CheckCircleIcon size={16} />
+            ) : toast.type === 'error' ? (
+              <AlertTriangleIcon size={16} />
+            ) : (
+              <InfoIcon size={16} />
+            )}
           </span>
-          <button
-            type="button"
-            className="toast-close-btn"
-            onClick={() => setShowMovementHint(false)}
-            aria-label="Cerrar notificación"
-          >
-            ✕
-          </button>
+          <span>{toast.message}</span>
         </div>
       )}
 
       {/* Object Catalog Drawer */}
       <ObjectCatalogDrawer
         isOpen={isCatalogOpen}
-        onClose={() => setIsCatalogOpen(false)}
+        onClose={handleFinishDesign}
         onStartPlacement={handleStartPlacement}
         activePlacingObjectId={activePlacing?.objectId ?? null}
         onClearAll={handleClearAll}
-        isPhysicsDebug={isPhysicsDebug}
-        onTogglePhysicsDebug={handleTogglePhysicsDebug}
       />
 
       {/* Character Selection Onboarding / Switcher Modal */}
@@ -660,9 +650,17 @@ function App() {
         onClose={() => {
           setIsN8nModalOpen(false);
           setSelectedAgentCode(null);
+          gameInstance?.events.emit('request-hide-agent-bubbles');
         }}
         gameInstance={gameInstance}
         initialAgentCode={selectedAgentCode}
+      />
+
+      {/* Principal Agent Conversational Chat */}
+      <OfficeChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        gameInstance={gameInstance}
       />
     </div>
   );

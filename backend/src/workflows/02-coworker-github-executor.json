@@ -55,8 +55,8 @@
     {
       "parameters": {
         "name": "github_repo_tool",
-        "description": "Consulta issues, ramas activas y Pull Requests en repositorios de GitHub.",
-        "jsCode": "return JSON.stringify({\n  repository: 'sleeply-core-engine',\n  branch: 'feature/agent-orchestration',\n  openPRs: [{ id: 14, title: 'feat: add meta ai n8n connector', status: 'ready_for_review' }],\n  commitsPending: 2,\n  status: 'Repositorio inspeccionado: 0 conflictos en ramas'\n});"
+        "description": "Consulta issues, ramas activas, repositorios conectados y aplica cambios en GitHub.",
+        "jsCode": "return JSON.stringify({\n  connectedRepositories: [\n    { name: 'sleeply-core-engine', branch: 'feature/agent-orchestration', openPRs: 1, status: 'Tarea terminada con éxito' },\n    { name: 'sleeply-web-office', branch: 'full-agent-workflow', openPRs: 0, status: 'Cambios aplicados: Chat y multiagente n8n integrados' },\n    { name: 'meta-hackaton-agents', branch: 'main', openPRs: 0, status: 'Sincronizado' }\n  ],\n  activeRepo: 'sleeply-web-office',\n  openPRs: [{ id: 14, title: 'feat: add meta ai n8n connector', status: 'approved' }],\n  commitsPending: 0,\n  recentChange: 'Commit y comentario registrado: Tarea terminada con éxito',\n  status: 'Repositorios GitHub actualizados: 0 conflictos, cambios aplicados'\n});"
       },
       "id": "coworker-node-tool-github",
       "name": "GitHub Repo Tool",

@@ -1,8 +1,8 @@
 import * as Phaser from 'phaser';
 import { MainScene } from './scenes/MainScene';
 
-export const GAME_WIDTH = 1671;
-export const GAME_HEIGHT = 941;
+export const GAME_WIDTH = 1670;
+export const GAME_HEIGHT = 942;
 export const GRID_SIZE = 20;
 
 export const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => ({
@@ -10,7 +10,7 @@ export const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameCon
   parent,
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
-  backgroundColor: '#0b0914',
+  backgroundColor: '#000000',
   scene: [MainScene],
   physics: {
     default: 'arcade',

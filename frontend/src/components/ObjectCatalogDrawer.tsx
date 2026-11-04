@@ -5,6 +5,18 @@ import {
   type AtlasKey,
   type OfficeObjectDefinition,
 } from '../game/models/OfficeObjectModel';
+import {
+  GridAllIcon,
+  MonitorIcon,
+  ChairIcon,
+  SofaIcon,
+  ArchiveIcon,
+  ZapIcon,
+  PlantIcon,
+  BoxIcon,
+  TrashIcon,
+  CloseIcon,
+} from './Icons';
 
 interface ObjectCatalogDrawerProps {
   isOpen: boolean;
@@ -12,8 +24,6 @@ interface ObjectCatalogDrawerProps {
   onStartPlacement: (objectId: string) => void;
   activePlacingObjectId: string | null;
   onClearAll: () => void;
-  isPhysicsDebug: boolean;
-  onTogglePhysicsDebug: () => void;
 }
 
 type CategoryFilter = 'all' | ObjectCategory;
@@ -34,19 +44,40 @@ const ATLAS_TABS: AtlasTab[] = [
 interface CategoryTab {
   id: CategoryFilter;
   label: string;
-  icon: string;
 }
 
 const CATEGORY_TABS: CategoryTab[] = [
-  { id: 'all', label: 'Todos', icon: '✦' },
-  { id: 'desk', label: 'Escritorios', icon: '🖥' },
-  { id: 'chair', label: 'Sillas', icon: '💺' },
-  { id: 'seating', label: 'Sofás / Lounge', icon: '🛋' },
-  { id: 'storage', label: 'Archivadores & Racks', icon: '🗄' },
-  { id: 'electronics', label: 'Tecnología', icon: '⚡' },
-  { id: 'decoration', label: 'Plantas & Dec.', icon: '🪴' },
-  { id: 'accessory', label: 'Accesorios', icon: '📦' },
+  { id: 'all', label: 'Todos' },
+  { id: 'desk', label: 'Escritorios' },
+  { id: 'chair', label: 'Sillas' },
+  { id: 'seating', label: 'Sofás / Lounge' },
+  { id: 'storage', label: 'Archivadores & Racks' },
+  { id: 'electronics', label: 'Tecnología' },
+  { id: 'decoration', label: 'Plantas & Dec.' },
+  { id: 'accessory', label: 'Accesorios' },
 ];
+
+const renderCategoryIcon = (category: CategoryFilter) => {
+  switch (category) {
+    case 'desk':
+      return <MonitorIcon size={16} />;
+    case 'chair':
+      return <ChairIcon size={16} />;
+    case 'seating':
+      return <SofaIcon size={16} />;
+    case 'storage':
+      return <ArchiveIcon size={16} />;
+    case 'electronics':
+      return <ZapIcon size={16} />;
+    case 'decoration':
+      return <PlantIcon size={16} />;
+    case 'accessory':
+      return <BoxIcon size={16} />;
+    case 'all':
+    default:
+      return <GridAllIcon size={16} />;
+  }
+};
 
 export const ObjectCatalogDrawer = ({
   isOpen,
@@ -54,8 +85,6 @@ export const ObjectCatalogDrawer = ({
   onStartPlacement,
   activePlacingObjectId,
   onClearAll,
-  isPhysicsDebug,
-  onTogglePhysicsDebug,
 }: ObjectCatalogDrawerProps) => {
   const [selectedAtlas, setSelectedAtlas] = useState<AtlasFilter>('all');
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
@@ -78,8 +107,16 @@ export const ObjectCatalogDrawer = ({
   if (!isOpen) return null;
 
   return (
-    <aside className="catalog-drawer-overlay" aria-label="Catálogo de Mobiliario y Equipamiento">
-      <div className="catalog-drawer-panel">
+    <aside
+      className="catalog-drawer-overlay"
+      aria-label="Catálogo de Mobiliario y Equipamiento"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="catalog-drawer-panel" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <header className="catalog-header">
           <div className="catalog-title-group">
@@ -92,16 +129,6 @@ export const ObjectCatalogDrawer = ({
           <div className="catalog-header-actions">
             <button
               type="button"
-              className={`catalog-tool-btn ${isPhysicsDebug ? 'active' : ''}`}
-              onClick={onTogglePhysicsDebug}
-              title="Mostrar u ocultar cajas de colisión Arcade Physics"
-            >
-              <span className="btn-icon">⚡</span>
-              <span className="btn-label">{isPhysicsDebug ? 'Físicas: ON' : 'Físicas: OFF'}</span>
-            </button>
-
-            <button
-              type="button"
               className="catalog-tool-btn danger"
               onClick={() => {
                 if (window.confirm('¿Deseas eliminar todos los objetos colocados en la oficina?')) {
@@ -110,7 +137,7 @@ export const ObjectCatalogDrawer = ({
               }}
               title="Limpiar todos los objetos del piso"
             >
-              <span className="btn-icon">🗑</span>
+              <TrashIcon size={14} />
               <span className="btn-label">Limpiar Todo</span>
             </button>
 
@@ -120,7 +147,7 @@ export const ObjectCatalogDrawer = ({
               onClick={onClose}
               aria-label="Cerrar catálogo"
             >
-              ✕
+              <CloseIcon size={18} />
             </button>
           </div>
         </header>
@@ -159,7 +186,7 @@ export const ObjectCatalogDrawer = ({
                 className="search-clear-btn"
                 onClick={() => setSearchQuery('')}
               >
-                ✕
+                <CloseIcon size={14} />
               </button>
             )}
           </div>
@@ -173,7 +200,7 @@ export const ObjectCatalogDrawer = ({
                 className={`category-tab-btn ${selectedCategory === tab.id ? 'active' : ''}`}
                 onClick={() => setSelectedCategory(tab.id)}
               >
-                <span className="tab-icon">{tab.icon}</span>
+                <span className="tab-icon">{renderCategoryIcon(tab.id)}</span>
                 <span className="tab-label">{tab.label}</span>
               </button>
             ))}

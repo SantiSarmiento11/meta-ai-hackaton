@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
-import dayRoomUrl from '../../assets/Rooms/Habitación Isométrica Sleeply de Día.png';
-import nightRoomUrl from '../../assets/Rooms/Habitación Sleeply bajo la luz de la luna.png';
+import dayRoomUrl from '../../assets/Rooms/Rooms FInal Version/Oficina isométrica  dia con logo Sleeply.png';
+import nightRoomUrl from '../../assets/Rooms/Rooms FInal Version/Oficina nocturna con neón Sleeply.png';
 import techOfficeAtlasUrl from '../../assets/Spritesheets/Atlas isométrico de oficina tecnológica.png';
 import modernOfficeAtlasUrl from '../../assets/Spritesheets/Hoja de sprites de oficina moderna.png';
 import charactersSpritesheetUrl from '../../assets/Spritesheets/Hoja de sprites pixel art transparente.png';
@@ -37,9 +37,9 @@ export class MainScene extends Phaser.Scene {
   public static readonly DEFAULT_ZOOM = 1.0;
 
   // Floor isometric anchor coordinates calibrated to the new room diorama
-  private readonly topVertex: WorldPoint = { x: 838, y: 298 };
-  private readonly stepU: WorldPoint = { x: 35.60, y: 15.75 };
-  private readonly stepV: WorldPoint = { x: -35.60, y: 15.75 };
+  private readonly topVertex: WorldPoint = { x: 848, y: 297 };
+  private readonly stepU: WorldPoint = { x: 34.40, y: 15.15 };
+  private readonly stepV: WorldPoint = { x: -34.40, y: 15.15 };
 
   private dayOfficeImage?: Phaser.GameObjects.Image;
   private nightOfficeImage?: Phaser.GameObjects.Image;
@@ -72,6 +72,9 @@ export class MainScene extends Phaser.Scene {
     const centerX = width / 2;
     const centerY = height / 2;
 
+    // Set background color to pure black matching room artwork
+    this.cameras.main.setBackgroundColor('#000000');
+
     // Render daytime office background as base
     this.dayOfficeImage = this.add.image(centerX, centerY, 'day_office');
     this.dayOfficeImage.setOrigin(0.5);
@@ -93,13 +96,16 @@ export class MainScene extends Phaser.Scene {
     // Initialize Office Agent NPC Manager for virtual office automation representation
     this.agentManager = new OfficeAgentManager(this);
 
+    // Spawns the default CEO avatar immediately on scene creation
+    this.spawnPlayer('char_0');
+
     // Build the 20x20 isometric floor grid (invisible by default, shows in placement mode)
     this.createIsometricGrid();
 
     // Setup interactive placement and cursor tracking
     this.setupPlacementControls();
 
-    // Setup interactive camera zoom & pan
+    // Setup interactive camera zoom (camera position stays fixed)
     this.setupCameraControls();
 
     // Setup global game event bridge for external UI controls (React)
@@ -111,20 +117,39 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Configures mouse pointer tracking for placement mode and object selection.
+   * Configures mouse pointer tracking for placement mode, object selection and click-to-move.
    */
   private setupPlacementControls(): void {
-    // Track pointer movement across isometric grid
+    const tryMovePlayer = (pointer: Phaser.Input.Pointer, isInitialClick: boolean = false) => {
+      if (!this.player || this.objectManager?.isPlacing()) return;
+
+      // Check if interactive objects (NPC agent sprite or furniture) were clicked
+      const hits = this.input.hitTestPointer(pointer);
+      const isOverInteractive = hits && hits.some(obj => obj !== this.player && obj.input && obj.input.enabled);
+      if (isOverInteractive) return;
+
+      const grid = this.worldToGrid(pointer.worldX, pointer.worldY);
+      if (grid.col >= -2 && grid.col <= 22 && grid.row >= -2 && grid.row <= 22) {
+        const clampedCol = Phaser.Math.Clamp(grid.col, 0.6, 19.4);
+        const clampedRow = Phaser.Math.Clamp(grid.row, 0.6, 19.4);
+        const targetWorld = this.gridToWorld(clampedCol, clampedRow);
+        this.player.moveTo(targetWorld.x, targetWorld.y, isInitialClick);
+      }
+    };
+
+    // Track pointer movement across isometric grid (and continuous click-to-move when holding left button)
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
       if (this.objectManager?.isPlacing()) {
         const grid = this.worldToGrid(pointer.worldX, pointer.worldY);
         const col = Math.floor(grid.col);
         const row = Math.floor(grid.row);
         this.objectManager.updatePlacementGhost(col, row);
+      } else if (pointer.isDown && pointer.button === 0) {
+        tryMovePlayer(pointer, false);
       }
     });
 
-    // Handle clicks for confirming placement or deselecting
+    // Handle clicks for confirming placement, deselecting, or initiating movement
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.rightButtonDown()) {
         // Right click cancels placement or deselects
@@ -139,17 +164,16 @@ export class MainScene extends Phaser.Scene {
       if (pointer.leftButtonDown()) {
         if (this.objectManager?.isPlacing()) {
           this.objectManager.confirmPlacement();
+        } else {
+          tryMovePlayer(pointer, true);
         }
       }
     });
 
-    // Click-to-move navigation on the floor when not placing objects or dragging camera
+    // Ensure final target update on releasing mouse
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.button === 0 && pointer.getDistance() < 10 && !this.objectManager?.isPlacing()) {
-        const grid = this.worldToGrid(pointer.worldX, pointer.worldY);
-        if (grid.col >= 0.5 && grid.col <= 19.5 && grid.row >= 0.5 && grid.row <= 19.5) {
-          this.player?.moveTo(pointer.worldX, pointer.worldY);
-        }
+      if (pointer.button === 0 && !this.objectManager?.isPlacing()) {
+        tryMovePlayer(pointer, false);
       }
     });
 
@@ -281,6 +305,9 @@ export class MainScene extends Phaser.Scene {
     this.input.enabled = enabled;
     if (this.input.keyboard) {
       this.input.keyboard.enabled = enabled;
+      if (enabled) {
+        this.input.keyboard.resetKeys();
+      }
     }
   }
 
@@ -321,23 +348,25 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Changes the camera zoom with a smooth easing animation.
+   * Changes the camera zoom with a smooth easing animation, strictly maintaining camera scroll at (0, 0).
    */
   public setZoom(target: number, duration: number = 300): void {
     const clamped = Phaser.Math.Clamp(target, MainScene.MIN_ZOOM, MainScene.MAX_ZOOM);
     this.targetZoom = Math.round(clamped * 100) / 100;
 
     this.tweens.killTweensOf(this.cameras.main);
+    this.cameras.main.setScroll(0, 0);
+
     this.tweens.add({
       targets: this.cameras.main,
       zoom: this.targetZoom,
       duration,
       ease: 'Cubic.easeOut',
+      onUpdate: () => {
+        this.cameras.main.setScroll(0, 0);
+      },
       onComplete: () => {
-        if (this.targetZoom <= 1.0) {
-          const { width, height } = this.scale;
-          this.cameras.main.pan(width / 2, height / 2, 250, 'Cubic.easeOut');
-        }
+        this.cameras.main.setScroll(0, 0);
       },
     });
 
@@ -357,9 +386,11 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Configures wheel zoom and camera panning when zoomed in.
+   * Configures wheel zoom. Camera displacement is prohibited; camera scroll is permanently fixed at (0, 0).
    */
   private setupCameraControls(): void {
+    this.cameras.main.setScroll(0, 0);
+
     this.input.on(
       'wheel',
       (
@@ -372,16 +403,6 @@ export class MainScene extends Phaser.Scene {
         this.setZoom(this.targetZoom + factor, 180);
       }
     );
-
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      // Pan camera if mouse is dragged and not in placement mode
-      if (pointer.isDown && this.cameras.main.zoom > 1.0 && !this.objectManager?.isPlacing()) {
-        const dx = (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-        const dy = (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
-        this.cameras.main.scrollX -= dx;
-        this.cameras.main.scrollY -= dy;
-      }
-    });
   }
 
   /**
@@ -447,6 +468,8 @@ export class MainScene extends Phaser.Scene {
     const onSpawnAgents = (states?: AgentLiveState[]) => this.agentManager?.spawnAllAgents(states);
     const onUpdateAgentStates = (states: AgentLiveState[]) => this.agentManager?.updateAgentStates(states);
     const onUpdateSingleAgent = (state: AgentLiveState) => this.agentManager?.updateSingleAgent(state);
+    const onHideAgentBubbles = () => this.agentManager?.hideAllAgentBubbles();
+    const onAgentSelected = (code: string) => this.agentManager?.showAgentBubble(code);
 
     this.game.events.on('request-toggle-mode', onToggleMode);
     this.game.events.on('request-set-mode', onSetMode);
@@ -468,6 +491,8 @@ export class MainScene extends Phaser.Scene {
     this.game.events.on('request-spawn-agents', onSpawnAgents);
     this.game.events.on('request-update-agent-states', onUpdateAgentStates);
     this.game.events.on('request-update-single-agent', onUpdateSingleAgent);
+    this.game.events.on('request-hide-agent-bubbles', onHideAgentBubbles);
+    this.game.events.on('agent-selected', onAgentSelected);
 
     // Clean up event listeners when scene is shutdown or destroyed
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -491,6 +516,8 @@ export class MainScene extends Phaser.Scene {
       this.game.events.off('request-spawn-agents', onSpawnAgents);
       this.game.events.off('request-update-agent-states', onUpdateAgentStates);
       this.game.events.off('request-update-single-agent', onUpdateSingleAgent);
+      this.game.events.off('request-hide-agent-bubbles', onHideAgentBubbles);
+      this.game.events.off('agent-selected', onAgentSelected);
     });
   }
 

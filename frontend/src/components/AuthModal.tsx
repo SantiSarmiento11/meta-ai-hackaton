@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import sleeplyLogo from '../assets/sleeply (svg).svg';
-import dayRoomImg from '../assets/Rooms/Habitación Isométrica Sleeply de Día.png';
-import nightRoomImg from '../assets/Rooms/Habitación Sleeply bajo la luz de la luna.png';
+import dayRoomImg from '../assets/Rooms/Rooms FInal Version/Oficina isométrica  dia con logo Sleeply.png';
+import nightRoomImg from '../assets/Rooms/Rooms FInal Version/Oficina nocturna con neón Sleeply.png';
 import char0Full from '../assets/characters/char_0_full.png';
 import char1Full from '../assets/characters/char_1_full.png';
 import char2Full from '../assets/characters/char_2_full.png';
 import char3Full from '../assets/characters/char_3_full.png';
 import { api, type User } from '../services/api';
+import {
+  SunIcon,
+  MoonIcon,
+  AlertTriangleIcon,
+  SparklesIcon,
+  RocketIcon,
+  ZapIcon,
+  LockIcon,
+} from './Icons';
 import './AuthModal.css';
 
 interface AuthModalProps {
@@ -80,22 +89,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             />
             <div className="auth-preview-overlay">
               <div className="auth-preview-label">
-                <span>{previewMode === 'day' ? '☀️ Modo Vigilia (Día)' : '🌙 Modo Sueño (Noche)'}</span>
+                <span className="auth-mode-indicator">
+                  {previewMode === 'day' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
+                  <span>{previewMode === 'day' ? 'Modo Vigilia (Día)' : 'Modo Sueño (Noche)'}</span>
+                </span>
                 <button
                   type="button"
-                  className="auth-scale-button"
-                  style={{
-                    background: 'rgba(56, 189, 248, 0.25)',
-                    border: '1px solid rgba(56, 189, 248, 0.5)',
-                    color: '#ffffff',
-                    borderRadius: '8px',
-                    padding: '3px 10px',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                  }}
+                  className="auth-scale-button auth-toggle-mode-btn"
                   onClick={() => setPreviewMode((prev) => (prev === 'day' ? 'night' : 'day'))}
                 >
-                  Ver en Modo {previewMode === 'day' ? 'Noche' : 'Día'}
+                  {previewMode === 'day' ? <MoonIcon size={13} /> : <SunIcon size={13} />}
+                  <span>Ver en Modo {previewMode === 'day' ? 'Noche' : 'Día'}</span>
                 </button>
               </div>
             </div>
@@ -126,14 +130,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <span className="auth-char-role">Manager</span>
               </div>
             </div>
-          </div>
-
-          {/* Technical Feature Badges */}
-          <div className="auth-feature-tags">
-            <span className="auth-feature-tag">🏢 Oficina 20x20 con 160 Piezas</span>
-            <span className="auth-feature-tag">🤖 Meta AI + n8n Live Workflows</span>
-            <span className="auth-feature-tag">🗄️ PostgreSQL (localhost:5432)</span>
-            <span className="auth-feature-tag">🔒 Sesiones Cifradas JWT</span>
           </div>
         </div>
 
@@ -223,7 +219,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {errorMsg && (
               <div className="auth-error-pill" role="alert">
-                <span>⚠</span>
+                <AlertTriangleIcon size={16} />
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -233,7 +229,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               className="auth-primary-submit-btn auth-scale-button"
               disabled={isLoading}
             >
-              <span>{isRegister ? '✨' : '🚀'}</span>
+              {isRegister ? <SparklesIcon size={18} /> : <RocketIcon size={18} />}
               <span>
                 {isLoading
                   ? 'Verificando credenciales...'
@@ -249,13 +245,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onClick={fillDemoAccount}
               title="Cargar credenciales de demostración preconfiguradas del CEO"
             >
-              <span>⚡</span>
+              <ZapIcon size={16} />
               <span>Cargar Credenciales de Prueba (CEO)</span>
             </button>
           </form>
 
           <div className="auth-security-notice">
-            <span>🔒</span>
+            <LockIcon size={14} />
             <span>Acceso restringido: Es obligatorio iniciar sesión para desbloquear la oficina.</span>
           </div>
         </div>

@@ -69,6 +69,20 @@ export class OfficeAgentManager {
     }
   }
 
+  public hideAllAgentBubbles(): void {
+    this.npcs.forEach((npc) => npc.hideBubble());
+  }
+
+  public showAgentBubble(code: string): void {
+    this.npcs.forEach((npc, agentCode) => {
+      if (agentCode === code.toUpperCase()) {
+        npc.showBubble();
+      } else {
+        npc.hideBubble();
+      }
+    });
+  }
+
   public getAgent(code: string): OfficeAgentNPC | undefined {
     return this.npcs.get(code.toUpperCase());
   }

@@ -6,13 +6,21 @@ import {
   CHARACTERS_CATALOG,
 } from '../models/CharacterModel';
 
-export type MovementDirection = 'down' | 'up' | 'left' | 'right';
+export type MovementDirection =
+  | 'south'
+  | 'southeast'
+  | 'east'
+  | 'northeast'
+  | 'north'
+  | 'northwest'
+  | 'west'
+  | 'southwest';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public characterId: CharacterId;
-  private currentDirection: MovementDirection = 'down';
+  private currentDirection: MovementDirection = 'south';
   private targetPoint: Phaser.Math.Vector2 | null = null;
-  private moveSpeed: number = 200;
+  private moveSpeed: number = 215;
   private mainScene: MainScene;
 
   // Keyboard controls
@@ -34,11 +42,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     characterId: CharacterId = 'char_0'
   ) {
     const profile = getCharacterById(characterId) ?? CHARACTERS_CATALOG[0];
-    super(scene, x, y, 'characters_atlas', `${characterId}_frame_0`);
+    super(scene, x, y, 'characters_atlas', `${characterId}_idle_south`);
 
     this.mainScene = scene;
     this.characterId = characterId;
-    this.moveSpeed = profile.speed || 200;
+    this.moveSpeed = profile.speed || 215;
 
     // Add to scene display & physics systems
     scene.add.existing(this);
@@ -46,7 +54,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Visual setup
     this.setOrigin(0.5, 1.0);
-    this.setScale(0.65);
+    this.setScale(0.62);
     this.setDepth(this.y);
 
     // Setup Arcade Physics Body
@@ -66,15 +74,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   /**
    * Configures a tight, responsive collision box positioned at the character's feet.
-   * Frame size is 160x230, feet centered around x=80, y=222.
+   * Frame size is 160x180, feet centered around x=80, y=162..178.
    */
   private setupPhysicsBody(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (!body) return;
 
-    // Footprint body (approx 36x20 at bottom center of frame)
-    body.setSize(36, 20);
-    body.setOffset(62, 204);
+    body.setSize(36, 16);
+    body.setOffset(62, 162);
     body.setCollideWorldBounds(false);
   }
 
@@ -103,18 +110,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (!profile) return;
 
     this.characterId = characterId;
-    this.moveSpeed = profile.speed || 200;
+    this.moveSpeed = profile.speed || 215;
 
     // Smooth bounce transition
     this.mainScene.tweens.add({
       targets: this,
-      scaleX: 0.72,
-      scaleY: 0.58,
+      scaleX: 0.70,
+      scaleY: 0.55,
       yoyo: true,
       duration: 120,
       ease: 'Back.easeOut',
       onComplete: () => {
-        this.setScale(0.65);
+        this.setScale(0.62);
       },
     });
 
@@ -126,20 +133,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   /**
    * Commands the player to walk towards a world coordinate (click-to-move).
    */
-  public moveTo(worldX: number, worldY: number): void {
-    // Validate target is on the walkable diorama floor
+  public moveTo(worldX: number, worldY: number, showRipple: boolean = true): void {
+    // Validate target is on or clamp to the walkable diorama floor
     const grid = this.mainScene.worldToGrid(worldX, worldY);
-    if (grid.col < 0.5 || grid.col > 19.5 || grid.row < 0.5 || grid.row > 19.5) {
-      return;
-    }
+    const clampedCol = Phaser.Math.Clamp(grid.col, 0.6, 19.4);
+    const clampedRow = Phaser.Math.Clamp(grid.row, 0.6, 19.4);
+    const clampedWorld = this.mainScene.gridToWorld(clampedCol, clampedRow);
 
-    this.targetPoint = new Phaser.Math.Vector2(worldX, worldY);
+    this.targetPoint = new Phaser.Math.Vector2(clampedWorld.x, clampedWorld.y);
 
     // Animate click ripple indicator
-    if (this.clickIndicator) {
+    if (showRipple && this.clickIndicator) {
       this.clickIndicator.clear();
       this.clickIndicator.lineStyle(2, 0x38bdf8, 0.9);
-      this.clickIndicator.strokeCircle(worldX, worldY, 14);
+      this.clickIndicator.strokeCircle(clampedWorld.x, clampedWorld.y, 14);
       this.clickIndicator.setVisible(true);
 
       this.mainScene.tweens.killTweensOf(this.clickIndicator);
@@ -160,7 +167,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   /**
-   * Stops any active click-to-move target point.
+   * Stops any active movement.
    */
   public stopMoving(): void {
     this.targetPoint = null;
@@ -172,16 +179,24 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   /**
-   * Primary frame update loop: handles movement, physics, bounds, depth sorting and animations.
+   * Primary frame update loop: handles free movement, physics, bounds, depth sorting and animations.
    */
   public update(_time: number, _delta: number): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (!body) return;
 
+    // If input is globally disabled (e.g. during active modal dialogs), freeze
+    if (!this.mainScene.input.enabled || (this.mainScene.input.keyboard && !this.mainScene.input.keyboard.enabled)) {
+      body.setVelocity(0, 0);
+      this.targetPoint = null;
+      this.playAnimation('idle');
+      return;
+    }
+
     let inputX = 0;
     let inputY = 0;
 
-    // Check Keyboard Inputs
+    // Check Keyboard Inputs (Arrow keys and WASD)
     const leftDown = Boolean(this.cursors?.left?.isDown || this.wasdKeys?.A?.isDown);
     const rightDown = Boolean(this.cursors?.right?.isDown || this.wasdKeys?.D?.isDown);
     const upDown = Boolean(this.cursors?.up?.isDown || this.wasdKeys?.W?.isDown);
@@ -206,7 +221,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       // Click-to-move pathing
       const dist = Phaser.Math.Distance.Between(this.x, this.y, this.targetPoint.x, this.targetPoint.y);
 
-      if (dist < 8) {
+      if (dist < 6) {
         // Arrived at destination
         this.targetPoint = null;
         body.setVelocity(0, 0);
@@ -226,7 +241,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.playAnimation('idle');
     }
 
-    // Keep within isometric floor perimeter (0.6 <= col <= 19.4, 0.6 <= row <= 19.4)
+    // Keep within isometric floor perimeter
     this.constrainToWalkableFloor();
 
     // Maintain accurate isometric depth sorting
@@ -234,13 +249,29 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   /**
-   * Determines the primary direction based on movement velocity vector.
+   * Determines the 8-directional orientation based on movement velocity vector.
    */
   private updateDirection(vx: number, vy: number): void {
-    if (Math.abs(vy) > Math.abs(vx) * 0.9) {
-      this.currentDirection = vy > 0 ? 'down' : 'up';
+    if (vx === 0 && vy === 0) return;
+
+    const angleDeg = Phaser.Math.RadToDeg(Math.atan2(vy, vx)); // -180 to 180
+
+    if (angleDeg >= -22.5 && angleDeg < 22.5) {
+      this.currentDirection = 'east';
+    } else if (angleDeg >= 22.5 && angleDeg < 67.5) {
+      this.currentDirection = 'southeast';
+    } else if (angleDeg >= 67.5 && angleDeg < 112.5) {
+      this.currentDirection = 'south';
+    } else if (angleDeg >= 112.5 && angleDeg < 157.5) {
+      this.currentDirection = 'southwest';
+    } else if (angleDeg >= -67.5 && angleDeg < -22.5) {
+      this.currentDirection = 'northeast';
+    } else if (angleDeg >= -112.5 && angleDeg < -67.5) {
+      this.currentDirection = 'north';
+    } else if (angleDeg >= -157.5 && angleDeg < -112.5) {
+      this.currentDirection = 'northwest';
     } else {
-      this.currentDirection = vx > 0 ? 'right' : 'left';
+      this.currentDirection = 'west';
     }
   }
 
@@ -248,12 +279,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
    * Selects and plays the corresponding animation for the current state and direction.
    */
   private playAnimation(state: 'idle' | 'walk'): void {
-    const isSide = this.currentDirection === 'left' || this.currentDirection === 'right';
-    const animDir = isSide ? 'side' : this.currentDirection;
-    const animKey = `${this.characterId}_${state}_${animDir}`;
+    const animKey = `${this.characterId}_${state}_${this.currentDirection}`;
 
-    // Handle horizontal flipping for Left direction
-    this.setFlipX(this.currentDirection === 'left');
+    // All directions have dedicated hand-drawn sprites in atlas, no flipX needed
+    this.setFlipX(false);
 
     if (this.anims.currentAnim?.key !== animKey) {
       if (this.mainScene.anims.exists(animKey)) {
@@ -293,6 +322,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (clamped) {
       const worldPos = this.mainScene.gridToWorld(clampedCol, clampedRow);
       this.setPosition(worldPos.x, worldPos.y);
+
+      // Stop walking if clamped against perimeter
+      if (this.targetPoint) {
+        const dist = Phaser.Math.Distance.Between(this.x, this.y, this.targetPoint.x, this.targetPoint.y);
+        if (dist < 12) {
+          this.targetPoint = null;
+          const body = this.body as Phaser.Physics.Arcade.Body;
+          if (body) body.setVelocity(0, 0);
+          this.playAnimation('idle');
+        }
+      }
     }
   }
 

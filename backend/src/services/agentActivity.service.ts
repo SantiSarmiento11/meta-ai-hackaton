@@ -3,7 +3,7 @@ import { prisma } from '../database/prisma';
 import { n8nService } from './n8n.service';
 
 export interface AgentLiveState {
-  code: 'ASSISTANT' | 'COWORKER' | 'MANAGER';
+  code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO';
   name: string;
   role: string;
   avatar: string;
@@ -25,6 +25,25 @@ class AgentActivityService {
   }
 
   private initializeDefaultStates() {
+    this.agentStates.set('CEO', {
+      code: 'CEO',
+      name: 'Alex Vance',
+      role: 'CEO & Tech Lead',
+      avatar: 'char_0',
+      status: 'IDLE',
+      activeWorkflow: 'Sleeply - Central Agent Orchestrator',
+      workflowId: 'orch-central-001',
+      currentAction: 'Dirección general y orquestación estratégica',
+      bubbleMessage: 'Oficina conectada: Supervisión y arquitectura activas',
+      metaAiEndpoint: 'https://api.meta.ai/v1',
+      lastUpdated: new Date().toISOString(),
+      recentLogs: [
+        'Conectado al workflow Central Agent Orchestrator en n8n',
+        'Modelo Meta AI (https://api.meta.ai/v1) inicializado',
+        'Supervisión y ruteo estratégico de tareas activo',
+      ],
+    });
+
     this.agentStates.set('ASSISTANT', {
       code: 'ASSISTANT',
       name: 'Taylor Chen',
@@ -235,6 +254,290 @@ class AgentActivityService {
       state,
     };
   }
+
+  /**
+   * Principal Conversational AI Agent (Alex Vance / CEO) Chat Endpoint
+   * Routes user natural language requests to the appropriate specialized agent or responds directly.
+   */
+  public async chatWithPrincipalAgent(payload: {
+    message: string;
+    userId?: string;
+  }): Promise<{
+    success: boolean;
+    reply: string;
+    agentCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+    agentName: string;
+    agentRole: string;
+    avatar: string;
+    actionTaken?: string;
+    timestamp: string;
+  }> {
+    const text = (payload.message || '').toLowerCase();
+    let targetCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' = 'CEO';
+
+    if (
+      text.includes('github') ||
+      text.includes('repo') ||
+      text.includes('rama') ||
+      text.includes('código') ||
+      text.includes('pr') ||
+      text.includes('commit') ||
+      text.includes('test') ||
+      text.includes('sam')
+    ) {
+      targetCode = 'COWORKER';
+    } else if (
+      text.includes('correo') ||
+      text.includes('email') ||
+      text.includes('gmail') ||
+      text.includes('calendar') ||
+      text.includes('agenda') ||
+      text.includes('drive') ||
+      text.includes('minuta') ||
+      text.includes('taylor') ||
+      text.includes('secretaria')
+    ) {
+      targetCode = 'ASSISTANT';
+    } else if (
+      text.includes('manager') ||
+      text.includes('jordan') ||
+      text.includes('salud') ||
+      text.includes('sentry') ||
+      text.includes('postgres') ||
+      text.includes('reporte') ||
+      text.includes('supervisión') ||
+      text.includes('auditor') ||
+      text.includes('noche') ||
+      text.includes('sueño')
+    ) {
+      targetCode = 'MANAGER';
+    }
+
+    // If delegated to specialized agent, trigger their n8n workflow
+    if (targetCode !== 'CEO') {
+      const exec = await this.executeAgentAction(
+        targetCode,
+        payload.message.slice(0, 100),
+        payload.userId
+      );
+      const state = exec.state;
+      return {
+        success: true,
+        reply: exec.result.metaAiResponse || exec.result.bubbleMessage || 'Acción completada con éxito.',
+        agentCode: targetCode,
+        agentName: state.name,
+        agentRole: state.role,
+        avatar: state.avatar,
+        actionTaken: `Delegado a ${state.name} (${state.activeWorkflow})`,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    // Direct CEO Response (Alex Vance)
+    const ceoState = this.agentStates.get('CEO')!;
+    ceoState.bubbleMessage = 'Coordinación central: Supervisión activa de equipo y flujos n8n';
+    ceoState.currentAction = 'Atendiendo consulta en Chat Central de Oficina';
+    ceoState.lastUpdated = new Date().toISOString();
+    ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Consulta en Chat: "${payload.message.slice(0, 50)}"`);
+    if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
+
+    const reply =
+      `Reporte de Orquestación Central (Alex Vance - CEO & Tech Lead):\n` +
+      `He recibido tu instrucción: "${payload.message}".\n\n` +
+      `Estado actual del equipo multiagente y conexiones n8n:\n` +
+      `- Sam Rivera (Co-worker): Repositorios GitHub monitoreados (sleeply-core-engine, sleeply-web-office, meta-hackaton-agents). Suite Antigravity CLI lista.\n` +
+      `- Taylor Chen (Secretaria): Bandeja Gmail sin correos críticos. Agenda sincronizada en Google Calendar y documentos en Google Drive actualizados.\n` +
+      `- Jordan Díaz (Manager): Supervisión nocturna continua, base de datos PostgreSQL 100% saludable y 0 incidencias en Sentry.\n\n` +
+      `Puedes solicitar acciones directas como: hacer cambios en GitHub, triaje de correos, o auditoría del sistema.`;
+
+    return {
+      success: true,
+      reply,
+      agentCode: 'CEO',
+      agentName: ceoState.name,
+      agentRole: ceoState.role,
+      avatar: ceoState.avatar,
+      actionTaken: 'Orquestación general procesada',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Co-worker: GitHub Repositories Catalog & Status
+   */
+  public getCoworkerRepositories() {
+    return [
+      {
+        name: 'sleeply-core-engine',
+        description: 'Motor central de orquestación, agentes continuos y scheduler',
+        branch: 'feature/agent-orchestration',
+        openPRs: [{ id: 14, title: 'feat: add meta ai n8n connector', status: 'ready_for_review' }],
+        commitsPending: 0,
+        status: 'Tarea terminada con éxito: Conexión multiagente validada',
+      },
+      {
+        name: 'sleeply-web-office',
+        description: 'Oficina virtual isométrica 2D con Phaser 3, React y Chat interactivo',
+        branch: 'full-agent-workflow',
+        openPRs: [],
+        commitsPending: 0,
+        status: 'Cambios aplicados: Chat multiagente y n8n integrados',
+      },
+      {
+        name: 'meta-hackaton-agents',
+        description: 'Arquitectura multiagente con flujos de trabajo n8n y Meta AI',
+        branch: 'main',
+        openPRs: [],
+        commitsPending: 0,
+        status: 'Sincronizado con n8n-dev1.auto-node.tech',
+      },
+    ];
+  }
+
+  /**
+   * Co-worker: Execute GitHub Action
+   */
+  public async executeCoworkerRepoAction(payload: {
+    repoName: string;
+    actionType: string;
+    customInstruction?: string;
+    userId?: string;
+  }) {
+    let taskTitle = `GitHub: Acción ${payload.actionType} en ${payload.repoName}`;
+    let taskDesc = payload.customInstruction || `Ejecutar ${payload.actionType} en repositorio ${payload.repoName}`;
+
+    if (payload.actionType === 'commit_changes') {
+      taskTitle = `Commit y registro de cambios en ${payload.repoName}`;
+      taskDesc = `Registrar commit y comentar que la tarea finalizó con éxito en ${payload.repoName}`;
+    } else if (payload.actionType === 'review_pr') {
+      taskTitle = `Revisión y auditoría de PR #14 en ${payload.repoName}`;
+      taskDesc = `Auditoría técnica de código y aprobación de Pull Request #14`;
+    } else if (payload.actionType === 'run_cli_tests') {
+      taskTitle = `Suite de pruebas Antigravity CLI para ${payload.repoName}`;
+      taskDesc = `Ejecución de pruebas e2e, verificación de TypeScript y esquema PostgreSQL`;
+    }
+
+    return this.executeAgentAction('COWORKER', taskTitle, payload.userId);
+  }
+
+  /**
+   * Secretary: Google Drive & Gmail Catalog
+   */
+  public getSecretaryDriveFiles() {
+    return {
+      driveFiles: [
+        {
+          id: 'doc_final',
+          name: 'Sleeply_Entrega_Final_Proyecto.docx',
+          folder: 'Sleeply/Entregables',
+          modified: new Date().toISOString(),
+          status: 'Comentado: Tarea terminada con éxito. Multiagente y chat n8n validados.',
+        },
+        {
+          id: 'doc_01',
+          name: 'Minuta_Reunion_Estrategica_Q4.docx',
+          folder: 'Sleeply/Minutas',
+          modified: new Date().toISOString(),
+          status: 'Archivada',
+        },
+        {
+          id: 'sheet_02',
+          name: 'Presupuesto_Operativo_2026.xlsx',
+          folder: 'Sleeply/Finanzas',
+          modified: new Date().toISOString(),
+          status: 'Aprobado',
+        },
+      ],
+      gmailStatus: {
+        unread: 2,
+        highPriority: 1,
+        snippet: 'Propuesta Q4 y reporte semanal de servidores clasificados.',
+      },
+      calendarStatus: {
+        eventsToday: 2,
+        conflicts: 0,
+        nextEvent: 'Daily Standup de Equipo (09:00 AM)',
+      },
+    };
+  }
+
+  /**
+   * Secretary: Execute Google Drive / Gmail / Calendar Action
+   */
+  public async executeSecretaryDriveAction(payload: {
+    docId?: string;
+    actionType: string;
+    customInstruction?: string;
+    userId?: string;
+  }) {
+    let taskTitle = `Google Drive / Asistente: ${payload.actionType}`;
+    let taskDesc = payload.customInstruction || `Operación de asistente ejecutiva`;
+
+    if (payload.actionType === 'update_drive') {
+      taskTitle = `Actualizar documento en Google Drive y comentar éxito`;
+      taskDesc = `Registrar en Google Drive que la tarea finalizó con éxito y archivar minuta de entrega`;
+    } else if (payload.actionType === 'gmail_triage') {
+      taskTitle = `Triage de correos urgentes en Gmail`;
+      taskDesc = `Clasificar correos de clientes y miembros de equipo`;
+    } else if (payload.actionType === 'calendar_sync') {
+      taskTitle = `Coordinación de eventos en Google Calendar`;
+      taskDesc = `Revisar compromisos del día y verificar ausencia de colisiones`;
+    }
+
+    return this.executeAgentAction('ASSISTANT', taskTitle, payload.userId);
+  }
+
+  /**
+   * Manager: System Health & Audit Status
+   */
+  public getManagerSystemHealth() {
+    return {
+      systemStatus: 'HEALTHY',
+      uptime: '99.98%',
+      database: {
+        name: 'sleeply_db (PostgreSQL 17 en localhost:5432)',
+        status: 'CONNECTED',
+        tasksCompleted: 12,
+        tasksInProgress: 1,
+        errors: 0,
+      },
+      sentry: {
+        activeIncidents: 0,
+        resolvedIncidents: 4,
+        healthScore: 100,
+      },
+      notifications: {
+        telegramChannel: 'Activo (@sleeply_ceo)',
+        discordWebhook: 'Activo (#exec-updates)',
+      },
+    };
+  }
+
+  /**
+   * Manager: Execute Audit Action
+   */
+  public async executeManagerAuditAction(payload: {
+    actionType: string;
+    customInstruction?: string;
+    userId?: string;
+  }) {
+    let taskTitle = `Manager: ${payload.actionType}`;
+    let taskDesc = payload.customInstruction || `Operación de supervisión operativa`;
+
+    if (payload.actionType === 'morning_report') {
+      taskTitle = `Compilación de reporte matutino y auditoría modo sueño`;
+      taskDesc = `Consolidar tareas de la noche, estado de PostgreSQL y emitir reporte matutino`;
+    } else if (payload.actionType === 'system_audit') {
+      taskTitle = `Auditoría integral de salud del sistema`;
+      taskDesc = `Verificar base de datos PostgreSQL, colas y disponibilidad de servicios n8n`;
+    } else if (payload.actionType === 'send_alert') {
+      taskTitle = `Despachar notificación de estado a Telegram y Discord`;
+      taskDesc = `Enviar resumen de supervisión a los canales oficiales del equipo`;
+    }
+
+    return this.executeAgentAction('MANAGER', taskTitle, payload.userId);
+  }
 }
 
 export const agentActivityService = new AgentActivityService();
+

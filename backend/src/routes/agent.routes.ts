@@ -5,6 +5,13 @@ import {
   getAgentActivity,
   updateAgentActivity,
   executeAgentAction,
+  chatWithPrincipalAgent,
+  getCoworkerRepositories,
+  executeCoworkerRepoAction,
+  getSecretaryDriveFiles,
+  executeSecretaryDriveAction,
+  getManagerSystemHealth,
+  executeManagerAction,
 } from '../controllers/agent.controller';
 import { authenticateToken } from '../middlewares/auth.middleware';
 import { env } from '../config/env';
@@ -33,11 +40,24 @@ const authenticateUserOrN8n = (req: Request, res: Response, next: NextFunction):
 router.get('/activity', getAgentActivity);
 router.post('/activity', authenticateUserOrN8n, updateAgentActivity);
 
-// Protected endpoints for user management
+// Protected endpoints for user management and agent actions
 router.use(authenticateToken);
 router.get('/', getAgents);
+router.post('/chat', chatWithPrincipalAgent);
+
+// Specialized Agent Endpoints
+router.get('/coworker/repositories', getCoworkerRepositories);
+router.post('/coworker/action', executeCoworkerRepoAction);
+
+router.get('/secretary/drive-files', getSecretaryDriveFiles);
+router.post('/secretary/action', executeSecretaryDriveAction);
+
+router.get('/manager/health', getManagerSystemHealth);
+router.post('/manager/action', executeManagerAction);
+
 router.post('/:code/action', executeAgentAction);
 router.patch('/:id', updateAgent);
 
 export default router;
+
 

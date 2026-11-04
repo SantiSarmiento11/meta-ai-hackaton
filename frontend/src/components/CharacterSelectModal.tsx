@@ -4,6 +4,7 @@ import {
   type CharacterId,
   type CharacterProfile,
 } from '../game/models/CharacterModel';
+import { CloseIcon, CheckIcon, GamepadIcon } from './Icons';
 import './CharacterSelectModal.css';
 
 interface CharacterSelectModalProps {
@@ -70,7 +71,7 @@ export const CharacterSelectModal = ({
             aria-label="Cerrar modal"
             title="Cerrar (Esc)"
           >
-            ✕
+            <CloseIcon size={16} />
           </button>
         )}
 
@@ -133,7 +134,13 @@ export const CharacterSelectModal = ({
                 </div>
 
                 <div className="character-select-indicator">
-                  {isSelected ? '✓ Seleccionado' : 'Elegir'}
+                  {isSelected ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <CheckIcon size={13} /> Seleccionado
+                    </span>
+                  ) : (
+                    'Elegir'
+                  )}
                 </div>
               </div>
             );
@@ -142,7 +149,9 @@ export const CharacterSelectModal = ({
 
         <footer className="character-modal-footer">
           <div className="character-controls-hint">
-            <span className="hint-icon">🎮</span>
+            <span className="hint-icon">
+              <GamepadIcon size={16} />
+            </span>
             <span>
               <strong>Controles en la oficina:</strong> Teclas <code>W</code> <code>A</code> <code>S</code> <code>D</code> o <code>Flechas</code> para caminar | <strong>Clic</strong> en el piso para desplazarte.
             </span>

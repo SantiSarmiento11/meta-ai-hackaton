@@ -17,7 +17,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #0b0914;
+  background-color: #000000;
   font-family: var(--font-family);
   color: var(--text-main);
   user-select: none;
@@ -34,12 +34,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0b0914;
+  background-color: #000000;
   z-index: 1;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
 }
 
 .phaser-viewport-container canvas {
   display: block;
+  touch-action: none;
+  user-select: none;
 }
 
 /* Minimalist Floating HUD Overlay */
@@ -52,7 +57,7 @@
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
-  z-index: 50;
+  z-index: 200;
   gap: 16px;
 }
 
@@ -61,6 +66,36 @@
   pointer-events: auto;
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.brand-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-logout-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.45);
+}
+
+.brand-logout-btn:active {
+  transform: scale(0.95);
 }
 
 .brand-logo-white {
@@ -172,6 +207,28 @@
   color: #ffffff;
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
 }
+
+/* Chat button */
+.chat-btn {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(30, 41, 59, 0.7) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #bfdbfe;
+}
+
+.chat-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.45) 0%, rgba(30, 41, 59, 0.85) 100%);
+  border-color: #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+}
+
+.chat-btn.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  border-color: #93c5fd;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  color: #ffffff;
+}
+
 
 /* Physics debug button */
 .physics-btn {
@@ -385,9 +442,13 @@
    ========================================================================== */
 .catalog-drawer-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(100vh - 70px);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
   z-index: 100;
   display: flex;
   justify-content: flex-end;
@@ -400,6 +461,8 @@
   height: 100%;
   background: #0f172a;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-left-radius: 16px;
   display: flex;
   flex-direction: column;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.7);
@@ -926,6 +989,20 @@
   border-color: rgba(74, 222, 128, 0.5);
 }
 
+.hud-pill-button.done-btn {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.85) 0%, rgba(21, 128, 61, 0.95) 100%);
+  border-color: rgba(74, 222, 128, 0.6);
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(34, 197, 94, 0.35);
+}
+
+.hud-pill-button.done-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #4ade80;
+  box-shadow: 0 6px 24px rgba(34, 197, 94, 0.5), 0 0 16px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px) scale(1.05);
+}
+
 .hud-pill-button.n8n-btn {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
   border-color: rgba(56, 189, 248, 0.35);
@@ -946,26 +1023,17 @@
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
 }
 
-.hud-logout-btn {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-  padding: 0;
+.hud-pill-button.logout-btn {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
 }
 
-.hud-logout-btn:hover {
-  transform: scale(1.1);
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.4);
-  background: rgba(239, 68, 68, 0.15);
+.hud-pill-button.logout-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
 }
 
 .sync-status-toast {
@@ -1005,4 +1073,88 @@
 
 .sync-status-toast.error {
   border-color: rgba(248, 113, 113, 0.4);
+}
+
+/* Done / Listo Action Buttons */
+.catalog-done-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border: 1px solid rgba(74, 222, 128, 0.5);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  transition: all 0.2s;
+}
+
+.catalog-done-btn:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.45);
+}
+
+.placement-done-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34, 197, 94, 0.25);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  color: #4ade80;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.placement-done-btn:hover {
+  background: rgba(34, 197, 94, 0.4);
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+.selected-action-btn.done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34, 197, 94, 0.22);
+  border-color: rgba(74, 222, 128, 0.5);
+  color: #4ade80;
+}
+
+.selected-action-btn.done:hover {
+  background: rgba(34, 197, 94, 0.38);
+  color: #ffffff;
+}
+
+.selected-action-btn.move {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selected-action-btn.delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selected-action-btn.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-spin {
+  animation: spinAround 1s linear infinite;
+}
+
+@keyframes spinAround {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

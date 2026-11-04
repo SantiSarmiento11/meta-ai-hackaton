@@ -6,6 +6,7 @@ import char0Full from '../../assets/characters/char_0_full.png';
 import char1Full from '../../assets/characters/char_1_full.png';
 import char2Full from '../../assets/characters/char_2_full.png';
 import char3Full from '../../assets/characters/char_3_full.png';
+import charactersAtlasData from '../../assets/Spritesheets/characters_atlas.json';
 
 export type CharacterId = 'char_0' | 'char_1' | 'char_2' | 'char_3';
 
@@ -26,985 +27,58 @@ export const CHARACTERS_CATALOG: CharacterProfile[] = [
   {
     id: 'char_0',
     name: 'Alex Vance',
-    role: 'Tech Lead & Architect',
-    department: 'Engineering',
-    description: 'Arquitecto de sistemas con traje ejecutivo moderno. Enfocado en estabilidad, velocidad y escalabilidad de la infraestructura.',
+    role: 'CEO & Tech Lead',
+    department: 'Dirección & Arquitectura',
+    description: 'Director ejecutivo y arquitecto principal en traje corporativo oscuro. Lidera la visión estratégica y la estabilidad de la oficina inteligente.',
     themeColor: '#38bdf8',
     avatarUrl: char0Avatar,
     fullUrl: char0Full,
-    speed: 210,
-    traits: ['Estrategia', 'Sistemas', 'Rendimiento'],
+    speed: 215,
+    traits: ['Liderazgo', 'Estrategia', 'Escalabilidad'],
   },
   {
     id: 'char_1',
     name: 'Sam Rivera',
-    role: 'Product Manager',
-    department: 'Producto',
-    description: 'Líder de producto dinámica con estilo corporativo casual. Conecta visión de usuario y entregas de alto impacto.',
+    role: 'Co-Worker Developer',
+    department: 'Ingeniería & Automatización',
+    description: 'Compañero de equipo y desarrollador en vestimenta casual moderna. Conecta flujos de trabajo, automatizaciones n8n y soporte técnico.',
     themeColor: '#fb923c',
     avatarUrl: char1Avatar,
     fullUrl: char1Full,
     speed: 200,
-    traits: ['Roadmaps', 'Priorización', 'Agilidad'],
+    traits: ['Automatización', 'Trabajo en Equipo', 'Agilidad'],
   },
   {
     id: 'char_2',
     name: 'Taylor Chen',
-    role: 'Creative Developer',
-    department: 'Experiencia & Frontend',
-    description: 'Desarrollador creativo con chaqueta roja distintiva. Especialista en micro-interacciones, animaciones y game feel.',
-    themeColor: '#f87171',
+    role: 'Secretaria & Asistente Ejecutiva',
+    department: 'Operaciones & Coordinación',
+    description: 'Asistente ejecutiva y coordinadora de oficina con atuendo profesional distinguido. Gestiona la agenda, recepción de tareas y comunicación.',
+    themeColor: '#ec4899',
     avatarUrl: char2Avatar,
     fullUrl: char2Full,
-    speed: 220,
-    traits: ['Animación', 'Shader FX', 'Creatividad'],
+    speed: 210,
+    traits: ['Coordinación', 'Atención', 'Operaciones'],
   },
   {
     id: 'char_3',
     name: 'Jordan Díaz',
-    role: 'Lead UI/UX Designer',
-    department: 'Diseño',
-    description: 'Diseñador visual con atuendo beige minimalista. Perfecciona cada detalle visual, contraste y ergonomía espacial.',
-    themeColor: '#a78bfa',
+    role: 'Office Manager & Supervisor',
+    department: 'Supervisión & Calidad',
+    description: 'Gerente de oficina y supervisor de procesos. Supervisa el estado de agentes inteligentes, control de calidad y salud del equipo.',
+    themeColor: '#a855f7',
     avatarUrl: char3Avatar,
     fullUrl: char3Full,
-    speed: 200,
-    traits: ['Sistemas de Diseño', 'Accesibilidad', 'Pixel Art'],
+    speed: 205,
+    traits: ['Supervisión', 'Resolución', 'Gestión'],
   },
 ];
 
-export const CHARACTERS_ATLAS_DATA = {
-  "frames": {
-    "char_0_frame_0": {
-      "frame": {
-        "x": 95,
-        "y": 14,
-        "w": 91,
-        "h": 214
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 37,
-        "y": 8,
-        "w": 91,
-        "h": 214
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_1": {
-      "frame": {
-        "x": 244,
-        "y": 14,
-        "w": 91,
-        "h": 212
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 29,
-        "y": 10,
-        "w": 91,
-        "h": 212
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_2": {
-      "frame": {
-        "x": 399,
-        "y": 14,
-        "w": 88,
-        "h": 214
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 30,
-        "y": 8,
-        "w": 88,
-        "h": 214
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_3": {
-      "frame": {
-        "x": 555,
-        "y": 15,
-        "w": 91,
-        "h": 213
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 39,
-        "y": 9,
-        "w": 91,
-        "h": 213
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_4": {
-      "frame": {
-        "x": 696,
-        "y": 14,
-        "w": 101,
-        "h": 214
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 23,
-        "y": 8,
-        "w": 101,
-        "h": 214
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_5": {
-      "frame": {
-        "x": 844,
-        "y": 16,
-        "w": 95,
-        "h": 206
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 30,
-        "y": 16,
-        "w": 95,
-        "h": 206
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_6": {
-      "frame": {
-        "x": 988,
-        "y": 17,
-        "w": 88,
-        "h": 211
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 25,
-        "y": 11,
-        "w": 88,
-        "h": 211
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_7": {
-      "frame": {
-        "x": 1149,
-        "y": 22,
-        "w": 104,
-        "h": 206
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 13,
-        "y": 16,
-        "w": 104,
-        "h": 206
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_8": {
-      "frame": {
-        "x": 1321,
-        "y": 20,
-        "w": 100,
-        "h": 208
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 15,
-        "y": 14,
-        "w": 100,
-        "h": 208
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_0_frame_9": {
-      "frame": {
-        "x": 1499,
-        "y": 19,
-        "w": 117,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 14,
-        "y": 13,
-        "w": 117,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_0": {
-      "frame": {
-        "x": 92,
-        "y": 249,
-        "w": 93,
-        "h": 200
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 35,
-        "y": 22,
-        "w": 93,
-        "h": 200
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_1": {
-      "frame": {
-        "x": 249,
-        "y": 254,
-        "w": 86,
-        "h": 193
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 43,
-        "y": 29,
-        "w": 86,
-        "h": 193
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_2": {
-      "frame": {
-        "x": 400,
-        "y": 249,
-        "w": 91,
-        "h": 200
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 27,
-        "y": 22,
-        "w": 91,
-        "h": 200
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_3": {
-      "frame": {
-        "x": 557,
-        "y": 249,
-        "w": 94,
-        "h": 201
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 30,
-        "y": 21,
-        "w": 94,
-        "h": 201
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_4": {
-      "frame": {
-        "x": 702,
-        "y": 249,
-        "w": 93,
-        "h": 202
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 20,
-        "y": 20,
-        "w": 93,
-        "h": 202
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_5": {
-      "frame": {
-        "x": 845,
-        "y": 249,
-        "w": 93,
-        "h": 202
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 21,
-        "y": 20,
-        "w": 93,
-        "h": 202
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_6": {
-      "frame": {
-        "x": 983,
-        "y": 251,
-        "w": 93,
-        "h": 201
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 19,
-        "y": 21,
-        "w": 93,
-        "h": 201
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_7": {
-      "frame": {
-        "x": 1146,
-        "y": 251,
-        "w": 110,
-        "h": 194
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 2,
-        "y": 28,
-        "w": 110,
-        "h": 194
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_8": {
-      "frame": {
-        "x": 1315,
-        "y": 250,
-        "w": 109,
-        "h": 195
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 27,
-        "w": 109,
-        "h": 195
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_1_frame_9": {
-      "frame": {
-        "x": 1477,
-        "y": 250,
-        "w": 146,
-        "h": 200
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 11,
-        "y": 22,
-        "w": 146,
-        "h": 200
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_0": {
-      "frame": {
-        "x": 92,
-        "y": 465,
-        "w": 92,
-        "h": 211
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 37,
-        "y": 11,
-        "w": 92,
-        "h": 211
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_1": {
-      "frame": {
-        "x": 245,
-        "y": 467,
-        "w": 91,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 37,
-        "y": 13,
-        "w": 91,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_2": {
-      "frame": {
-        "x": 402,
-        "y": 467,
-        "w": 95,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 39,
-        "y": 13,
-        "w": 95,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_3": {
-      "frame": {
-        "x": 557,
-        "y": 466,
-        "w": 92,
-        "h": 210
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 26,
-        "y": 12,
-        "w": 92,
-        "h": 210
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_4": {
-      "frame": {
-        "x": 699,
-        "y": 466,
-        "w": 99,
-        "h": 210
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 19,
-        "y": 12,
-        "w": 99,
-        "h": 210
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_5": {
-      "frame": {
-        "x": 849,
-        "y": 467,
-        "w": 90,
-        "h": 207
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 32,
-        "y": 15,
-        "w": 90,
-        "h": 207
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_6": {
-      "frame": {
-        "x": 1150,
-        "y": 467,
-        "w": 107,
-        "h": 207
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 10,
-        "y": 15,
-        "w": 107,
-        "h": 207
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_7": {
-      "frame": {
-        "x": 1322,
-        "y": 467,
-        "w": 113,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 6,
-        "y": 13,
-        "w": 113,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_2_frame_8": {
-      "frame": {
-        "x": 1503,
-        "y": 467,
-        "w": 108,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 11,
-        "y": 13,
-        "w": 108,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_0": {
-      "frame": {
-        "x": 94,
-        "y": 698,
-        "w": 90,
-        "h": 211
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 38,
-        "y": 11,
-        "w": 90,
-        "h": 211
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_1": {
-      "frame": {
-        "x": 249,
-        "y": 699,
-        "w": 89,
-        "h": 207
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 42,
-        "y": 15,
-        "w": 89,
-        "h": 207
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_2": {
-      "frame": {
-        "x": 409,
-        "y": 699,
-        "w": 90,
-        "h": 210
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 35,
-        "y": 12,
-        "w": 90,
-        "h": 210
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_3": {
-      "frame": {
-        "x": 560,
-        "y": 699,
-        "w": 97,
-        "h": 210
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 25,
-        "y": 12,
-        "w": 97,
-        "h": 210
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_4": {
-      "frame": {
-        "x": 697,
-        "y": 698,
-        "w": 103,
-        "h": 207
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 13,
-        "y": 15,
-        "w": 103,
-        "h": 207
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_5": {
-      "frame": {
-        "x": 852,
-        "y": 698,
-        "w": 103,
-        "h": 202
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 24,
-        "y": 20,
-        "w": 103,
-        "h": 202
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_6": {
-      "frame": {
-        "x": 1129,
-        "y": 704,
-        "w": 110,
-        "h": 207
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 9,
-        "y": 15,
-        "w": 110,
-        "h": 207
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_7": {
-      "frame": {
-        "x": 1317,
-        "y": 701,
-        "w": 110,
-        "h": 210
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 9,
-        "y": 12,
-        "w": 110,
-        "h": 210
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    },
-    "char_3_frame_8": {
-      "frame": {
-        "x": 1503,
-        "y": 702,
-        "w": 110,
-        "h": 209
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 9,
-        "y": 13,
-        "w": 110,
-        "h": 209
-      },
-      "sourceSize": {
-        "w": 160,
-        "h": 230
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 1.0
-      }
-    }
-  },
-  "meta": {
-    "app": "Sleeply Character Atlas Generator",
-    "version": "1.0",
-    "image": "Hoja de sprites pixel art transparente.png",
-    "format": "RGBA8888",
-    "size": {
-      "w": 1679,
-      "h": 937
-    },
-    "scale": "1"
-  }
-};
+export const CHARACTERS_ATLAS_DATA = charactersAtlasData;
 
 export const getCharacterById = (id: string): CharacterProfile | undefined => {
   return CHARACTERS_CATALOG.find(c => c.id === id);
 };
-
 
 export interface AnimationDefinition {
   key: string;
@@ -1013,39 +87,136 @@ export interface AnimationDefinition {
   repeat: number;
 }
 
+const DIRECTIONS_LIST = [
+  'north',
+  'northeast',
+  'east',
+  'southeast',
+  'south',
+  'southwest',
+  'west',
+  'northwest',
+] as const;
+
+const DIRECTION_CARDINAL_MAP: Record<string, string> = {
+  down: 'south',
+  up: 'north',
+  side: 'east',
+  right: 'east',
+  left: 'west',
+  down_right: 'southeast',
+  down_left: 'southwest',
+  up_right: 'northeast',
+  up_left: 'northwest',
+};
+
+function buildCharacterAnimations(charId: CharacterId): AnimationDefinition[] {
+  const anims: AnimationDefinition[] = [];
+
+  // 1. Build animations for all 8 standard directions
+  for (const dir of DIRECTIONS_LIST) {
+    // Idle (1 frame)
+    anims.push({
+      key: `${charId}_idle_${dir}`,
+      frames: [`${charId}_idle_${dir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+
+    // Walk (alternates idle and walk poses for natural walking cycle)
+    anims.push({
+      key: `${charId}_walk_${dir}`,
+      frames: [`${charId}_idle_${dir}`, `${charId}_walk_${dir}`],
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    // Talking (alternates idle and speaking gesture)
+    anims.push({
+      key: `${charId}_talking_${dir}`,
+      frames: [`${charId}_idle_${dir}`, `${charId}_talking_${dir}`],
+      frameRate: 4,
+      repeat: -1,
+    });
+
+    // Seated (static or low rate)
+    anims.push({
+      key: `${charId}_seated_${dir}`,
+      frames: [`${charId}_seated_${dir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+
+    // Agitated (alert/frantic pulse)
+    anims.push({
+      key: `${charId}_agitated_${dir}`,
+      frames: [`${charId}_idle_${dir}`, `${charId}_agitated_${dir}`],
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    // Collapsed / Sleeping / Exhausted
+    anims.push({
+      key: `${charId}_collapsed_${dir}`,
+      frames: [`${charId}_collapsed_${dir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+  }
+
+  // 2. Add cardinal and isometric shorthand aliases (down, up, side, left, right, etc.)
+  for (const [alias, targetDir] of Object.entries(DIRECTION_CARDINAL_MAP)) {
+    anims.push({
+      key: `${charId}_idle_${alias}`,
+      frames: [`${charId}_idle_${targetDir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+
+    anims.push({
+      key: `${charId}_walk_${alias}`,
+      frames: [`${charId}_idle_${targetDir}`, `${charId}_walk_${targetDir}`],
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    anims.push({
+      key: `${charId}_talking_${alias}`,
+      frames: [`${charId}_idle_${targetDir}`, `${charId}_talking_${targetDir}`],
+      frameRate: 4,
+      repeat: -1,
+    });
+
+    anims.push({
+      key: `${charId}_seated_${alias}`,
+      frames: [`${charId}_seated_${targetDir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+
+    anims.push({
+      key: `${charId}_agitated_${alias}`,
+      frames: [`${charId}_idle_${targetDir}`, `${charId}_agitated_${targetDir}`],
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    anims.push({
+      key: `${charId}_collapsed_${alias}`,
+      frames: [`${charId}_collapsed_${targetDir}`],
+      frameRate: 1,
+      repeat: 0,
+    });
+  }
+
+  return anims;
+}
+
 export const CHARACTER_ANIMATIONS: Record<CharacterId, AnimationDefinition[]> = {
-  char_0: [
-    { key: 'char_0_idle_down', frames: ['char_0_frame_0'], frameRate: 1, repeat: 0 },
-    { key: 'char_0_walk_down', frames: ['char_0_frame_3', 'char_0_frame_0', 'char_0_frame_4', 'char_0_frame_6'], frameRate: 6, repeat: -1 },
-    { key: 'char_0_idle_up', frames: ['char_0_frame_1'], frameRate: 1, repeat: 0 },
-    { key: 'char_0_walk_up', frames: ['char_0_frame_1', 'char_0_frame_2'], frameRate: 6, repeat: -1 },
-    { key: 'char_0_idle_side', frames: ['char_0_frame_7'], frameRate: 1, repeat: 0 },
-    { key: 'char_0_walk_side', frames: ['char_0_frame_7', 'char_0_frame_8'], frameRate: 6, repeat: -1 },
-  ],
-  char_1: [
-    { key: 'char_1_idle_down', frames: ['char_1_frame_0'], frameRate: 1, repeat: 0 },
-    { key: 'char_1_walk_down', frames: ['char_1_frame_3', 'char_1_frame_0', 'char_1_frame_4', 'char_1_frame_6'], frameRate: 6, repeat: -1 },
-    { key: 'char_1_idle_up', frames: ['char_1_frame_1'], frameRate: 1, repeat: 0 },
-    { key: 'char_1_walk_up', frames: ['char_1_frame_1', 'char_1_frame_2'], frameRate: 6, repeat: -1 },
-    { key: 'char_1_idle_side', frames: ['char_1_frame_7'], frameRate: 1, repeat: 0 },
-    { key: 'char_1_walk_side', frames: ['char_1_frame_7', 'char_1_frame_8'], frameRate: 6, repeat: -1 },
-  ],
-  char_2: [
-    { key: 'char_2_idle_down', frames: ['char_2_frame_0'], frameRate: 1, repeat: 0 },
-    { key: 'char_2_walk_down', frames: ['char_2_frame_2', 'char_2_frame_0', 'char_2_frame_3', 'char_2_frame_4'], frameRate: 6, repeat: -1 },
-    { key: 'char_2_idle_up', frames: ['char_2_frame_1'], frameRate: 1, repeat: 0 },
-    { key: 'char_2_walk_up', frames: ['char_2_frame_1'], frameRate: 4, repeat: -1 },
-    { key: 'char_2_idle_side', frames: ['char_2_frame_6'], frameRate: 1, repeat: 0 },
-    { key: 'char_2_walk_side', frames: ['char_2_frame_6', 'char_2_frame_7', 'char_2_frame_8'], frameRate: 6, repeat: -1 },
-  ],
-  char_3: [
-    { key: 'char_3_idle_down', frames: ['char_3_frame_0'], frameRate: 1, repeat: 0 },
-    { key: 'char_3_walk_down', frames: ['char_3_frame_2', 'char_3_frame_0', 'char_3_frame_3', 'char_3_frame_4'], frameRate: 6, repeat: -1 },
-    { key: 'char_3_idle_up', frames: ['char_3_frame_1'], frameRate: 1, repeat: 0 },
-    { key: 'char_3_walk_up', frames: ['char_3_frame_1'], frameRate: 4, repeat: -1 },
-    { key: 'char_3_idle_side', frames: ['char_3_frame_6'], frameRate: 1, repeat: 0 },
-    { key: 'char_3_walk_side', frames: ['char_3_frame_6', 'char_3_frame_7', 'char_3_frame_8'], frameRate: 6, repeat: -1 },
-  ],
+  char_0: buildCharacterAnimations('char_0'),
+  char_1: buildCharacterAnimations('char_1'),
+  char_2: buildCharacterAnimations('char_2'),
+  char_3: buildCharacterAnimations('char_3'),
 };
 
 export const registerCharacterAnimations = (scene: Phaser.Scene): void => {

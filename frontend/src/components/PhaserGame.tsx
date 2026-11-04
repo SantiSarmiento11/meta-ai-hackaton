@@ -11,6 +11,13 @@ interface PhaserGameProps {
 export const PhaserGame = ({ onGameReady, onSceneReady }: PhaserGameProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
+  const onGameReadyRef = useRef(onGameReady);
+  const onSceneReadyRef = useRef(onSceneReady);
+
+  useEffect(() => {
+    onGameReadyRef.current = onGameReady;
+    onSceneReadyRef.current = onSceneReady;
+  });
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -18,14 +25,16 @@ export const PhaserGame = ({ onGameReady, onSceneReady }: PhaserGameProps) => {
     const config = createGameConfig(containerRef.current);
     const game = new Phaser.Game(config);
     gameRef.current = game;
+    (window as unknown as { __PHASER_GAME__?: Phaser.Game }).__PHASER_GAME__ = game;
 
-    if (onGameReady) {
-      onGameReady(game);
+    if (onGameReadyRef.current) {
+      onGameReadyRef.current(game);
     }
 
     const handleSceneReady = (scene: MainScene) => {
-      if (onSceneReady) {
-        onSceneReady(scene);
+      (window as unknown as { __PHASER_SCENE__?: MainScene }).__PHASER_SCENE__ = scene;
+      if (onSceneReadyRef.current) {
+        onSceneReadyRef.current(scene);
       }
     };
 
@@ -47,7 +56,16 @@ export const PhaserGame = ({ onGameReady, onSceneReady }: PhaserGameProps) => {
         gameRef.current = null;
       }
     };
-  }, [onGameReady, onSceneReady]);
+  }, []);
 
-  return <div ref={containerRef} className="phaser-viewport-container" />;
+  return (
+    <div
+      ref={containerRef}
+      className="phaser-viewport-container"
+      tabIndex={0}
+      onMouseDown={() => {
+        containerRef.current?.focus();
+      }}
+    />
+  );
 };

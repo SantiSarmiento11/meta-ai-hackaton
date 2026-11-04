@@ -38,7 +38,7 @@ export interface AgentData {
 }
 
 export interface AgentLiveState {
-  code: 'ASSISTANT' | 'COWORKER' | 'MANAGER';
+  code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO';
   name: string;
   role: string;
   avatar: string;
@@ -69,6 +69,79 @@ export interface N8nTestResponse {
     webhookUrl: string;
     metaAiConfigured?: boolean;
     metaAiKeyPreview?: string;
+  };
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'agent';
+  agentCode?: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+  agentName?: string;
+  agentRole?: string;
+  avatar?: string;
+  text: string;
+  actionTaken?: string;
+  timestamp: string;
+}
+
+export interface ChatResponse {
+  success: boolean;
+  reply: string;
+  agentCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+  agentName: string;
+  agentRole: string;
+  avatar: string;
+  actionTaken?: string;
+  timestamp: string;
+}
+
+export interface GitHubRepositoryItem {
+  name: string;
+  description: string;
+  branch: string;
+  openPRs: Array<{ id: number; title: string; status: string }>;
+  commitsPending: number;
+  status: string;
+}
+
+export interface SecretaryDriveData {
+  driveFiles: Array<{
+    id: string;
+    name: string;
+    folder: string;
+    modified: string;
+    status: string;
+  }>;
+  gmailStatus: {
+    unread: number;
+    highPriority: number;
+    snippet: string;
+  };
+  calendarStatus: {
+    eventsToday: number;
+    conflicts: number;
+    nextEvent: string;
+  };
+}
+
+export interface ManagerHealthData {
+  systemStatus: string;
+  uptime: string;
+  database: {
+    name: string;
+    status: string;
+    tasksCompleted: number;
+    tasksInProgress: number;
+    errors: number;
+  };
+  sentry: {
+    activeIncidents: number;
+    resolvedIncidents: number;
+    healthScore: number;
+  };
+  notifications: {
+    telegramChannel: string;
+    discordWebhook: string;
   };
 }
 
@@ -199,6 +272,79 @@ class ApiService {
     return res;
   }
 
+  // Conversational Chat with Principal Agent (Alex Vance / CEO)
+  public async chatWithPrincipalAgent(message: string): Promise<ChatResponse> {
+    const res = await this.request<ChatResponse>('/agents/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+    return res;
+  }
+
+  // Co-worker: GitHub Repositories & Actions
+  public async getCoworkerRepositories(): Promise<GitHubRepositoryItem[]> {
+    const res = await this.request<{ success: boolean; repositories: GitHubRepositoryItem[] }>(
+      '/agents/coworker/repositories'
+    );
+    return res.repositories;
+  }
+
+  public async executeCoworkerAction(
+    repoName: string,
+    actionType: string,
+    customInstruction?: string
+  ): Promise<{ success: boolean; message: string; result: any; state: AgentLiveState }> {
+    const res = await this.request<{ success: boolean; message: string; result: any; state: AgentLiveState }>(
+      '/agents/coworker/action',
+      {
+        method: 'POST',
+        body: JSON.stringify({ repoName, actionType, customInstruction }),
+      }
+    );
+    return res;
+  }
+
+  // Secretary: Google Drive & Actions
+  public async getSecretaryDriveFiles(): Promise<SecretaryDriveData> {
+    const res = await this.request<{ success: boolean } & SecretaryDriveData>('/agents/secretary/drive-files');
+    return res;
+  }
+
+  public async executeSecretaryAction(
+    actionType: string,
+    docId?: string,
+    customInstruction?: string
+  ): Promise<{ success: boolean; message: string; result: any; state: AgentLiveState }> {
+    const res = await this.request<{ success: boolean; message: string; result: any; state: AgentLiveState }>(
+      '/agents/secretary/action',
+      {
+        method: 'POST',
+        body: JSON.stringify({ actionType, docId, customInstruction }),
+      }
+    );
+    return res;
+  }
+
+  // Manager: Health & Audit Actions
+  public async getManagerSystemHealth(): Promise<ManagerHealthData> {
+    const res = await this.request<{ success: boolean } & ManagerHealthData>('/agents/manager/health');
+    return res;
+  }
+
+  public async executeManagerAction(
+    actionType: string,
+    customInstruction?: string
+  ): Promise<{ success: boolean; message: string; result: any; state: AgentLiveState }> {
+    const res = await this.request<{ success: boolean; message: string; result: any; state: AgentLiveState }>(
+      '/agents/manager/action',
+      {
+        method: 'POST',
+        body: JSON.stringify({ actionType, customInstruction }),
+      }
+    );
+    return res;
+  }
+
   // Automation & n8n
   public async testN8nConnection(): Promise<N8nTestResponse> {
     const res = await this.request<{ success: boolean; data: N8nTestResponse }>('/automation/n8n/test');
@@ -207,3 +353,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
+
