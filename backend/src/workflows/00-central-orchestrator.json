@@ -1,0 +1,95 @@
+{
+  "name": "Sleeply - Central Agent Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sleeply-agent-orchestrator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "orch-node-webhook",
+      "name": "Central Orchestrator Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst agentCode = (body.agentCode || 'COWORKER').toUpperCase();\nlet assignedWorkflow = '';\nlet targetWebhook = '';\n\nif (agentCode === 'ASSISTANT') {\n  assignedWorkflow = 'Sleeply - Secretary Gmail & Calendar Manager';\n  targetWebhook = 'https://n8n-dev1.auto-node.tech/webhook/sleeply-secretary-agent';\n} else if (agentCode === 'MANAGER') {\n  assignedWorkflow = 'Sleeply - Manager Nightly Monitor & Report';\n  targetWebhook = 'https://n8n-dev1.auto-node.tech/webhook/sleeply-manager-agent';\n} else {\n  assignedWorkflow = 'Sleeply - Co-worker GitHub & Code Executor';\n  targetWebhook = 'https://n8n-dev1.auto-node.tech/webhook/sleeply-coworker-agent';\n}\n\nreturn [{\n  json: {\n    ...body,\n    orchestrated: true,\n    agentCode,\n    taskTitle: body.taskTitle || 'Tarea Orquestada Sleeply',\n    taskDescription: body.taskDescription || 'Procesamiento de rol automatizado con Meta AI',\n    operatingMode: body.operatingMode || 'awake',\n    assignedWorkflow,\n    targetWebhook,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "orch-node-router",
+      "name": "Agent Role Router",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.targetWebhook }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "orch-node-dispatch",
+      "name": "Dispatch to Agent Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [620, 240]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "orch-node-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [840, 240]
+    }
+  ],
+  "connections": {
+    "Central Orchestrator Webhook": {
+      "main": [
+        [
+          {
+            "node": "Agent Role Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent Role Router": {
+      "main": [
+        [
+          {
+            "node": "Dispatch to Agent Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispatch to Agent Workflow": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

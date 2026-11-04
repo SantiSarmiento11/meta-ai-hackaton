@@ -3,8 +3,17 @@ import dayRoomUrl from '../../assets/Rooms/Habitación Isométrica Sleeply de D�
 import nightRoomUrl from '../../assets/Rooms/Habitación Sleeply bajo la luz de la luna.png';
 import techOfficeAtlasUrl from '../../assets/Spritesheets/Atlas isométrico de oficina tecnológica.png';
 import modernOfficeAtlasUrl from '../../assets/Spritesheets/Hoja de sprites de oficina moderna.png';
+import charactersSpritesheetUrl from '../../assets/Spritesheets/Hoja de sprites pixel art transparente.png';
 import { OfficeObjectManager } from '../objects/OfficeObjectManager';
 import { OFFICE_OBJECTS_CATALOG, type OfficeObjectDefinition } from '../models/OfficeObjectModel';
+import {
+  CHARACTERS_ATLAS_DATA,
+  registerCharacterAnimations,
+  type CharacterId,
+} from '../models/CharacterModel';
+import { Player } from '../objects/Player';
+import { OfficeAgentManager } from '../objects/OfficeAgentManager';
+import type { AgentLiveState } from '../../services/api';
 
 export type OperatingMode = 'day' | 'night';
 
@@ -37,6 +46,8 @@ export class MainScene extends Phaser.Scene {
   private gridGraphics?: Phaser.GameObjects.Graphics;
 
   private objectManager?: OfficeObjectManager;
+  private agentManager?: OfficeAgentManager;
+  private player?: Player;
   private currentMode: OperatingMode = 'day';
   private isTransitioning: boolean = false;
   private targetZoom: number = MainScene.DEFAULT_ZOOM;
@@ -52,6 +63,8 @@ export class MainScene extends Phaser.Scene {
     // Load both unified high-resolution isometric atlases (1536x1024, 160 items total)
     this.load.image('tech_office_atlas', techOfficeAtlasUrl);
     this.load.image('modern_office_atlas', modernOfficeAtlasUrl);
+    // Load pixel-art character atlas with mapped animations
+    this.load.atlas('characters_atlas', charactersSpritesheetUrl, CHARACTERS_ATLAS_DATA);
   }
 
   create(): void {
@@ -73,6 +86,12 @@ export class MainScene extends Phaser.Scene {
     // Initialize the Office Object Manager with multi-atlas support and register all 160 frames
     this.objectManager = new OfficeObjectManager(this);
     this.objectManager.initializeFrames();
+
+    // Register character animations across all 4 characters
+    registerCharacterAnimations(this);
+
+    // Initialize Office Agent NPC Manager for virtual office automation representation
+    this.agentManager = new OfficeAgentManager(this);
 
     // Build the 20x20 isometric floor grid (invisible by default, shows in placement mode)
     this.createIsometricGrid();
@@ -120,6 +139,16 @@ export class MainScene extends Phaser.Scene {
       if (pointer.leftButtonDown()) {
         if (this.objectManager?.isPlacing()) {
           this.objectManager.confirmPlacement();
+        }
+      }
+    });
+
+    // Click-to-move navigation on the floor when not placing objects or dragging camera
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.button === 0 && pointer.getDistance() < 10 && !this.objectManager?.isPlacing()) {
+        const grid = this.worldToGrid(pointer.worldX, pointer.worldY);
+        if (grid.col >= 0.5 && grid.col <= 19.5 && grid.row >= 0.5 && grid.row <= 19.5) {
+          this.player?.moveTo(pointer.worldX, pointer.worldY);
         }
       }
     });
@@ -246,6 +275,13 @@ export class MainScene extends Phaser.Scene {
 
   public isGridVisible(): boolean {
     return this.gridGraphics?.visible ?? false;
+  }
+
+  public setInputEnabled(enabled: boolean): void {
+    this.input.enabled = enabled;
+    if (this.input.keyboard) {
+      this.input.keyboard.enabled = enabled;
+    }
   }
 
   /**
@@ -404,6 +440,13 @@ export class MainScene extends Phaser.Scene {
     const onMoveSelected = () => this.objectManager?.startMovingSelected();
     const onClearAll = () => this.objectManager?.clearAll();
     const onTogglePhysicsDebug = () => this.togglePhysicsDebug();
+    const onSelectCharacter = (characterId: CharacterId) => this.spawnPlayer(characterId);
+    const onSetInputEnabled = (enabled: boolean) => this.setInputEnabled(enabled);
+
+    // Office Agent NPC events
+    const onSpawnAgents = (states?: AgentLiveState[]) => this.agentManager?.spawnAllAgents(states);
+    const onUpdateAgentStates = (states: AgentLiveState[]) => this.agentManager?.updateAgentStates(states);
+    const onUpdateSingleAgent = (state: AgentLiveState) => this.agentManager?.updateSingleAgent(state);
 
     this.game.events.on('request-toggle-mode', onToggleMode);
     this.game.events.on('request-set-mode', onSetMode);
@@ -419,6 +462,12 @@ export class MainScene extends Phaser.Scene {
     this.game.events.on('request-move-selected', onMoveSelected);
     this.game.events.on('request-clear-all', onClearAll);
     this.game.events.on('request-toggle-physics-debug', onTogglePhysicsDebug);
+    this.game.events.on('request-select-character', onSelectCharacter);
+    this.game.events.on('request-set-input-enabled', onSetInputEnabled);
+
+    this.game.events.on('request-spawn-agents', onSpawnAgents);
+    this.game.events.on('request-update-agent-states', onUpdateAgentStates);
+    this.game.events.on('request-update-single-agent', onUpdateSingleAgent);
 
     // Clean up event listeners when scene is shutdown or destroyed
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -436,6 +485,53 @@ export class MainScene extends Phaser.Scene {
       this.game.events.off('request-move-selected', onMoveSelected);
       this.game.events.off('request-clear-all', onClearAll);
       this.game.events.off('request-toggle-physics-debug', onTogglePhysicsDebug);
+      this.game.events.off('request-select-character', onSelectCharacter);
+      this.game.events.off('request-set-input-enabled', onSetInputEnabled);
+
+      this.game.events.off('request-spawn-agents', onSpawnAgents);
+      this.game.events.off('request-update-agent-states', onUpdateAgentStates);
+      this.game.events.off('request-update-single-agent', onUpdateSingleAgent);
     });
+  }
+
+  /**
+   * Spawns or updates the player character in the office.
+   */
+  public spawnPlayer(characterId: CharacterId = 'char_0'): Player {
+    if (this.player) {
+      this.player.setCharacter(characterId);
+      this.game.events.emit('character-selected', characterId);
+      return this.player;
+    }
+
+    const spawnPoint = this.gridToWorld(10, 10);
+    this.player = new Player(this, spawnPoint.x, spawnPoint.y, characterId);
+
+    if (this.objectManager) {
+      this.physics.add.collider(this.player, this.objectManager.getPhysicsGroup());
+    }
+
+    this.game.events.emit('character-selected', characterId);
+    return this.player;
+  }
+
+  public getPlayer(): Player | undefined {
+    return this.player;
+  }
+
+  public getAgentManager(): OfficeAgentManager | undefined {
+    return this.agentManager;
+  }
+
+  public setCharacter(characterId: CharacterId): void {
+    this.spawnPlayer(characterId);
+  }
+
+  /**
+   * Main Scene update loop.
+   */
+  override update(time: number, delta: number): void {
+    super.update(time, delta);
+    this.player?.update(time, delta);
   }
 }
