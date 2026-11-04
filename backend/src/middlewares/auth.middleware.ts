@@ -10,7 +10,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   if (!token) {
     res.status(401).json({
       success: false,
-      error: 'Acceso no autorizado: Token no proporcionado',
+      error: 'Unauthorized access: Token not provided',
     });
     return;
   }
@@ -22,7 +22,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   } catch (error) {
     res.status(401).json({
       success: false,
-      error: 'Token inválido o expirado. Por favor inicia sesión nuevamente.',
+      error: 'Invalid or expired token. Please log in again.',
     });
   }
 };

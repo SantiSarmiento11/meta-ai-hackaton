@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   testN8nConnection,
+  testOpenClawConnection,
   getCredentials,
   upsertCredential,
   triggerWorkflow,
@@ -11,6 +12,7 @@ const router = Router();
 
 // Endpoint for testing n8n connection can be audited with or without JWT
 router.get('/n8n/test', testN8nConnection);
+router.get('/openclaw/test', testOpenClawConnection);
 
 // Protected endpoints
 router.use(authenticateToken);

@@ -6,6 +6,8 @@ import {
   updateAgentActivity,
   executeAgentAction,
   chatWithPrincipalAgent,
+  getChatHistory,
+  getMetaAiStatus,
   getCoworkerRepositories,
   executeCoworkerRepoAction,
   getSecretaryDriveFiles,
@@ -44,6 +46,8 @@ router.post('/activity', authenticateUserOrN8n, updateAgentActivity);
 router.use(authenticateToken);
 router.get('/', getAgents);
 router.post('/chat', chatWithPrincipalAgent);
+router.get('/chat/history', getChatHistory);
+router.get('/meta-ai/status', getMetaAiStatus);
 
 // Specialized Agent Endpoints
 router.get('/coworker/repositories', getCoworkerRepositories);

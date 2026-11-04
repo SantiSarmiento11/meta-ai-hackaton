@@ -1,13 +1,13 @@
 {
   "CEO": {
     "id": "HKDqzxQSleroRA0V",
-    "name": "Sleeply - Chat Principal & Orquestador (Alex Vance)",
+    "name": "Sleeply - Principal Chat & Orchestrator (Alex Vance)",
     "active": true,
     "webhookPath": "sleeply-chat-principal"
   },
   "ASSISTANT": {
     "id": "Ei8laDc9CAdA4IaB",
-    "name": "Sleeply - Secretaria Multi-Servicios (Taylor Chen)",
+    "name": "Sleeply - Multi-Service Executive Assistant (Taylor Chen)",
     "active": true,
     "webhookPath": "sleeply-secretary-agent"
   },

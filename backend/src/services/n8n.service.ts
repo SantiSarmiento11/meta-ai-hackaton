@@ -91,7 +91,7 @@ export class N8nService {
           workflowsUrl,
           statusCode: response.status,
           statusText: response.statusText,
-          message: `Conexión exitosa con el servidor n8n en ${endpoint}. Se detectaron ${workflows.length} flujos de trabajo disponibles. Meta AI configurado.`,
+          message: `Successful connection to n8n server at ${endpoint}. Detected ${workflows.length} available workflows. Meta AI configured.`,
           latencyMs,
           workflowsCount: workflows.length,
           workflows: workflows.map((w) => ({ id: w.id, name: w.name, active: w.active })),
@@ -104,7 +104,7 @@ export class N8nService {
           workflowsUrl,
           statusCode: response.status,
           statusText: response.statusText,
-          message: `El servidor n8n respondió con estado HTTP ${response.status} (${response.statusText}).`,
+          message: `The n8n server responded with HTTP status ${response.status} (${response.statusText}).`,
           latencyMs,
           testCredential,
         };
@@ -115,7 +115,7 @@ export class N8nService {
         connected: false,
         endpoint,
         workflowsUrl,
-        message: `Error de conexión con n8n: ${err.message}`,
+        message: `Connection error with n8n: ${err.message}`,
         latencyMs,
         testCredential,
       };

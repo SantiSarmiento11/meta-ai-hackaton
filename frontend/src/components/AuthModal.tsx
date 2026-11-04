@@ -46,7 +46,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       if (isRegister) {
         if (!name.trim()) {
-          throw new Error('Por favor ingresa tu nombre completo.');
+          throw new Error('Please enter your full name.');
         }
         const res = await api.register(email, password, name);
         onSuccess(res.user);
@@ -55,7 +55,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onSuccess(res.user);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error en la autenticación.');
+      setErrorMsg(err.message || 'Authentication error.');
     } finally {
       setIsLoading(false);
     }
@@ -83,21 +83,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           <p className="auth-tagline">
-            Oficina Virtual Isométrica 2D y Ecosistema de Agentes Autónomos. Delega tareas durante el día y avanza proyectos mientras descansas.
+            2D Isometric Virtual Office & Autonomous Multi-Agent Workforce. Delegate tasks during the day and advance projects while you sleep.
           </p>
 
           {/* Interactive Game Environment Preview */}
           <div className="auth-preview-card">
             <img
               src={previewMode === 'day' ? dayRoomImg : nightRoomImg}
-              alt={`Entorno de oficina Sleeply en modo ${previewMode}`}
+              alt={`Sleeply office environment in ${previewMode} mode`}
               className="auth-preview-img"
             />
             <div className="auth-preview-overlay">
               <div className="auth-preview-label">
                 <span className="auth-mode-indicator">
                   {previewMode === 'day' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
-                  <span>{previewMode === 'day' ? 'Modo Vigilia (Día)' : 'Modo Sueño (Noche)'}</span>
+                  <span>{previewMode === 'day' ? 'Day Mode (Awake)' : 'Night Mode (Sleep)'}</span>
                 </span>
                 <button
                   type="button"
@@ -105,7 +105,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onClick={() => setPreviewMode((prev) => (prev === 'day' ? 'night' : 'day'))}
                 >
                   {previewMode === 'day' ? <MoonIcon size={13} /> : <SunIcon size={13} />}
-                  <span>Ver en Modo {previewMode === 'day' ? 'Noche' : 'Día'}</span>
+                  <span>View in {previewMode === 'day' ? 'Night' : 'Day'} Mode</span>
                 </button>
               </div>
             </div>
@@ -113,7 +113,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Core Agents & Avatars Showcase */}
           <div className="auth-characters-showcase">
-            <h4 className="auth-showcase-title">Equipo de Agentes Inteligentes y Avatares</h4>
+            <h4 className="auth-showcase-title">Multi-Agent Workforce & Avatars</h4>
             <div className="auth-characters-grid">
               <div className="auth-char-item auth-scale-button" title="Alex Vance - CEO & Tech Lead">
                 <img src={char0Full} alt="Alex Vance" className="auth-char-portrait" />
@@ -125,12 +125,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <span className="auth-char-name">Sam R.</span>
                 <span className="auth-char-role">Co-worker</span>
               </div>
-              <div className="auth-char-item auth-scale-button" title="Taylor Chen - Asistente & Secretaria">
+              <div className="auth-char-item auth-scale-button" title="Taylor Chen - Executive Secretary">
                 <img src={char2Full} alt="Taylor Chen" className="auth-char-portrait" />
                 <span className="auth-char-name">Taylor C.</span>
-                <span className="auth-char-role">Asistente</span>
+                <span className="auth-char-role">Secretary</span>
               </div>
-              <div className="auth-char-item auth-scale-button" title="Jordan Díaz - Manager & Supervisor">
+              <div className="auth-char-item auth-scale-button" title="Jordan Díaz - Operations Manager">
                 <img src={char3Full} alt="Jordan Díaz" className="auth-char-portrait" />
                 <span className="auth-char-name">Jordan D.</span>
                 <span className="auth-char-role">Manager</span>
@@ -143,12 +143,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="auth-form-card">
           <div className="auth-form-header">
             <h2 className="auth-form-title">
-              {isRegister ? 'Crear Cuenta de Acceso' : 'Acceso a la Oficina'}
+              {isRegister ? 'Create Account' : 'Virtual Office Access'}
             </h2>
             <p className="auth-form-description">
               {isRegister
-                ? 'Regístrate para inicializar tu sede virtual y tu equipo de agentes.'
-                : 'Inicia sesión con tu cuenta para ingresar y explorar la oficina.'}
+                ? 'Register to initialize your virtual headquarters and multi-agent team.'
+                : 'Sign in with your account to enter and explore the office.'}
             </p>
           </div>
 
@@ -161,7 +161,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 setErrorMsg(null);
               }}
             >
-              Iniciar Sesión
+              Sign In
             </button>
             <button
               type="button"
@@ -171,7 +171,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 setErrorMsg(null);
               }}
             >
-              Registrarse
+              Register
             </button>
           </div>
 
@@ -179,13 +179,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {isRegister && (
               <div className="auth-input-group">
                 <label className="auth-field-label" htmlFor="reg-name">
-                  Nombre Completo
+                  Full Name
                 </label>
                 <input
                   id="reg-name"
                   type="text"
                   className="auth-text-input"
-                  placeholder="ej. Santiago Sarmiento"
+                  placeholder="e.g. Santiago Sarmiento"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -195,7 +195,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <div className="auth-input-group">
               <label className="auth-field-label" htmlFor="auth-email">
-                Correo Electrónico
+                Email Address
               </label>
               <input
                 id="auth-email"
@@ -210,7 +210,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <div className="auth-input-group">
               <label className="auth-field-label" htmlFor="auth-password">
-                Contraseña
+                Password
               </label>
               <input
                 id="auth-password"
@@ -238,10 +238,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {isRegister ? <SparklesIcon size={18} /> : <RocketIcon size={18} />}
               <span>
                 {isLoading
-                  ? 'Verificando credenciales...'
+                  ? 'Verifying credentials...'
                   : isRegister
-                  ? 'Crear Cuenta y Comenzar'
-                  : 'Ingresar a la Oficina'}
+                  ? 'Create Account & Begin'
+                  : 'Enter Office'}
               </span>
             </button>
 
@@ -249,16 +249,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               type="button"
               className="auth-demo-action-btn auth-scale-button"
               onClick={fillDemoAccount}
-              title="Cargar credenciales de demostración preconfiguradas del CEO"
+              title="Load preconfigured CEO demo credentials"
             >
               <ZapIcon size={16} />
-              <span>Cargar Credenciales de Prueba (CEO)</span>
+              <span>Load Demo Credentials (CEO)</span>
             </button>
           </form>
 
           <div className="auth-security-notice">
             <LockIcon size={14} />
-            <span>Acceso restringido: Es obligatorio iniciar sesión para desbloquear la oficina.</span>
+            <span>Restricted Access: Sign in required to unlock the virtual office.</span>
           </div>
         </div>
       </div>

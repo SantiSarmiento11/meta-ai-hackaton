@@ -7,7 +7,7 @@ export const getOffice = async (req: AuthRequest, res: Response): Promise<void> 
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -23,7 +23,7 @@ export const getOffice = async (req: AuthRequest, res: Response): Promise<void> 
       office = await prisma.office.create({
         data: {
           userId,
-          name: 'Oficina Central Sleeply',
+          name: 'Sleeply Central Office',
           currentMode: OperatingMode.DAY,
           selectedAvatarId: 'char_0',
           zoomLevel: 1.0,
@@ -43,7 +43,7 @@ export const getOffice = async (req: AuthRequest, res: Response): Promise<void> 
     console.error('[GetOffice Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al recuperar la oficina: ' + error.message,
+      error: 'Error retrieving office: ' + error.message,
     });
   }
 };
@@ -52,7 +52,7 @@ export const saveOffice = async (req: AuthRequest, res: Response): Promise<void>
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -74,7 +74,7 @@ export const saveOffice = async (req: AuthRequest, res: Response): Promise<void>
       office = await prisma.office.create({
         data: {
           userId,
-          name: name || 'Oficina Central Sleeply',
+          name: name || 'Sleeply Central Office',
           currentMode: currentMode === 'night' ? OperatingMode.NIGHT : OperatingMode.DAY,
           selectedAvatarId: selectedAvatarId || 'char_0',
           zoomLevel: typeof zoomLevel === 'number' ? zoomLevel : 1.0,
@@ -136,14 +136,14 @@ export const saveOffice = async (req: AuthRequest, res: Response): Promise<void>
 
     res.status(200).json({
       success: true,
-      message: 'Oficina y mobiliario guardados exitosamente',
+      message: 'Office and furniture saved successfully',
       office: updatedOffice,
     });
   } catch (error: any) {
     console.error('[SaveOffice Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al guardar la oficina: ' + error.message,
+      error: 'Error saving office: ' + error.message,
     });
   }
 };

@@ -68,8 +68,8 @@ export const CharacterSelectModal = ({
             type="button"
             className="character-modal-close-btn"
             onClick={onClose}
-            aria-label="Cerrar modal"
-            title="Cerrar (Esc)"
+            aria-label="Close modal"
+            title="Close (Esc)"
           >
             <CloseIcon size={16} />
           </button>
@@ -81,14 +81,14 @@ export const CharacterSelectModal = ({
             Sleeply Workspace
           </div>
           <h2 id="char-modal-title" className="character-modal-title">
-            Elige tu Personaje
+            Choose Your Character
           </h2>
           <p className="character-modal-subtitle">
-            Selecciona a uno de los 4 miembros del equipo para explorar la oficina isométrica y gestionar tu espacio.
+            Select one of the 4 team members to explore the isometric office and manage your workspace.
           </p>
         </header>
 
-        <div className="characters-grid" role="radiogroup" aria-label="Selección de personaje">
+        <div className="characters-grid" role="radiogroup" aria-label="Character selection">
           {CHARACTERS_CATALOG.map((character: CharacterProfile) => {
             const isSelected = character.id === activeId;
             return (
@@ -136,10 +136,10 @@ export const CharacterSelectModal = ({
                 <div className="character-select-indicator">
                   {isSelected ? (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <CheckIcon size={13} /> Seleccionado
+                      <CheckIcon size={13} /> Selected
                     </span>
                   ) : (
-                    'Elegir'
+                    'Choose'
                   )}
                 </div>
               </div>
@@ -153,7 +153,7 @@ export const CharacterSelectModal = ({
               <GamepadIcon size={16} />
             </span>
             <span>
-              <strong>Controles en la oficina:</strong> Teclas <code>W</code> <code>A</code> <code>S</code> <code>D</code> o <code>Flechas</code> para caminar | <strong>Clic</strong> en el piso para desplazarte.
+              <strong>Office navigation:</strong> <code>W</code> <code>A</code> <code>S</code> <code>D</code> or <code>Arrow keys</code> to walk | <strong>Click</strong> on floor tiles to pathfind.
             </span>
           </div>
 
@@ -163,7 +163,7 @@ export const CharacterSelectModal = ({
             style={{ '--char-theme': currentProfile.themeColor } as React.CSSProperties}
             onClick={handleConfirm}
           >
-            <span>Ingresar con {currentProfile.name}</span>
+            <span>Enter as {currentProfile.name}</span>
             <span className="btn-arrow">→</span>
           </button>
         </footer>

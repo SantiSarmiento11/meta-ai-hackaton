@@ -7,13 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencias y compilados
+# Dependencies and build outputs
 node_modules/
 dist/
 dist-ssr/
 *.local
 
-# Editor y sistema operativo
+# Editor and operating system files
 .vscode/*
 !.vscode/extensions.json
 .idea/
@@ -25,7 +25,7 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Secretos y variables de entorno
+# Environment variables and secrets
 .env
 .env.*
 .env.local
@@ -35,20 +35,27 @@ Thumbs.db
 *.pem
 *.key
 
-# Excepciones para plantillas de variables de entorno
+# Exceptions for environment variable templates
 !.env.example
 !.env.*.example
 
-# Entorno de Antigravity y configuración de agentes
+# AI agent environments and workspace configs
 .agents/
 .gemini/
 .antigravity/
 skills-lock.json
 GEMINI.md
 
-# Documentacion interna y especificaciones
-docs/*
-!docs/github_sync_report.md
-!docs/google_drive_sleeply_deliverable.md
+# Project documentation & internal specifications
+MULTI_AGENT_SKILLS_GUIDE.md
+*MVP Summary*.md
+*especificaci*.md
+docs/
 
-
+# Python scripts and temporary slice/test files
+*.py
+*.pyc
+__pycache__/
+temp_*
+temp_check_frames/
+temp_verify/

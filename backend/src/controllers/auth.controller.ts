@@ -13,7 +13,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     if (!email || !password || !name) {
       res.status(400).json({
         success: false,
-        error: 'Todos los campos (email, contraseña, nombre) son requeridos.',
+        error: 'All fields (email, password, name) are required.',
       });
       return;
     }
@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     if (existingUser) {
       res.status(409).json({
         success: false,
-        error: 'Ya existe un usuario registrado con este correo electrónico.',
+        error: 'A user with this email address already exists.',
       });
       return;
     }
@@ -52,7 +52,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       await tx.office.create({
         data: {
           userId: user.id,
-          name: 'Oficina Central Sleeply',
+          name: 'Sleeply Central Office',
           currentMode: 'DAY',
           selectedAvatarId: 'char_0',
           zoomLevel: 1.0,
@@ -67,28 +67,28 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             userId: user.id,
             code: AgentCode.COWORKER,
             name: 'Co-worker',
-            description: 'Ejecuta tareas técnicas asignadas y avanza entregables de proyectos.',
+            description: 'Executes assigned technical tasks and advances project deliverables.',
             avatar: 'char_1',
             status: 'IDLE',
-            instructions: 'Especialista en código, automatización y desarrollo de requerimientos.',
+            instructions: 'Specialist in code, automation, and technical delivery.',
           },
           {
             userId: user.id,
             code: AgentCode.ASSISTANT,
-            name: 'Asistente / Secretaria',
-            description: 'Organiza correos, mensajes, información clave y agenda operativa.',
+            name: 'Executive Assistant',
+            description: 'Organizes emails, documents, key information, and operational schedule.',
             avatar: 'char_2',
             status: 'IDLE',
-            instructions: 'Clasificación de información, síntesis de mensajes y preparación de contexto.',
+            instructions: 'Information classification, message summarization, and context preparation.',
           },
           {
             userId: user.id,
             code: AgentCode.MANAGER,
-            name: 'Manager',
-            description: 'Supervisa ejecuciones, coordina flujos de agentes y genera reportes matutinos.',
+            name: 'Operations Manager',
+            description: 'Supervises system executions, coordinates agent workflows, and generates morning reports.',
             avatar: 'char_3',
             status: 'IDLE',
-            instructions: 'Orquestación de flujos de trabajo en n8n, control de calidad y mitigación de fallos.',
+            instructions: 'n8n workflow orchestration, quality assurance, and failure mitigation.',
           },
         ],
       });
@@ -143,7 +143,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente',
+      message: 'User registered successfully',
       token,
       user: {
         id: newUser.id,
@@ -156,7 +156,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.error('[Register Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error interno al registrar el usuario: ' + error.message,
+      error: 'Internal error registering user: ' + error.message,
     });
   }
 };
@@ -168,7 +168,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!email || !password) {
       res.status(400).json({
         success: false,
-        error: 'Email y contraseña son requeridos.',
+        error: 'Email and password are required.',
       });
       return;
     }
@@ -188,7 +188,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!user) {
       res.status(401).json({
         success: false,
-        error: 'Credenciales inválidas. Por favor verifica tus datos.',
+        error: 'Invalid credentials. Please verify your details.',
       });
       return;
     }
@@ -198,7 +198,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!isPasswordValid) {
       res.status(401).json({
         success: false,
-        error: 'Credenciales inválidas. Por favor verifica tus datos.',
+        error: 'Invalid credentials. Please verify your details.',
       });
       return;
     }
@@ -217,7 +217,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({
       success: true,
-      message: 'Inicio de sesión exitoso',
+      message: 'Login successful',
       token,
       user: {
         id: user.id,
@@ -230,7 +230,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     console.error('[Login Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error interno durante el inicio de sesión: ' + error.message,
+      error: 'Internal error during login: ' + error.message,
     });
   }
 };
@@ -238,7 +238,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      res.status(401).json({ success: false, error: 'No autenticado' });
+      res.status(401).json({ success: false, error: 'Not authenticated' });
       return;
     }
 
@@ -261,7 +261,7 @@ export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<v
     });
 
     if (!user) {
-      res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+      res.status(404).json({ success: false, error: 'User not found' });
       return;
     }
 
@@ -273,7 +273,7 @@ export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<v
     console.error('[GetCurrentUser Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener datos del usuario: ' + error.message,
+      error: 'Error retrieving user data: ' + error.message,
     });
   }
 };

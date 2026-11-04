@@ -3,12 +3,13 @@ import { prisma } from '../database/prisma';
 import { AuthRequest } from '../types';
 import { AgentStatus } from '@prisma/client';
 import { agentActivityService } from '../services/agentActivity.service';
+import { metaAiService } from '../services/metaAi.service';
 
 export const getAgents = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -25,7 +26,7 @@ export const getAgents = async (req: AuthRequest, res: Response): Promise<void> 
     console.error('[GetAgents Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener los agentes: ' + error.message,
+      error: 'Error fetching agents: ' + error.message,
     });
   }
 };
@@ -41,7 +42,7 @@ export const getAgentActivity = async (_req: AuthRequest, res: Response): Promis
     console.error('[GetAgentActivity Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener la actividad de agentes: ' + error.message,
+      error: 'Error fetching agent activity: ' + error.message,
     });
   }
 };
@@ -50,7 +51,7 @@ export const updateAgentActivity = async (req: AuthRequest, res: Response): Prom
   try {
     const { agentCode, status, activeWorkflow, currentAction, bubbleMessage, logEntry } = req.body;
     if (!agentCode) {
-      res.status(400).json({ success: false, error: 'agentCode es requerido' });
+      res.status(400).json({ success: false, error: 'agentCode is required' });
       return;
     }
 
@@ -65,14 +66,14 @@ export const updateAgentActivity = async (req: AuthRequest, res: Response): Prom
 
     res.status(200).json({
       success: true,
-      message: 'Actividad de agente actualizada',
+      message: 'Agent activity updated successfully',
       state,
     });
   } catch (error: any) {
     console.error('[UpdateAgentActivity Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al actualizar actividad de agente: ' + error.message,
+      error: 'Error updating agent activity: ' + error.message,
     });
   }
 };
@@ -84,25 +85,25 @@ export const executeAgentAction = async (req: AuthRequest, res: Response): Promi
     const userId = req.user?.id;
 
     if (!code) {
-      res.status(400).json({ success: false, error: 'Código de agente es requerido' });
+      res.status(400).json({ success: false, error: 'Agent code is required' });
       return;
     }
 
     const result = await agentActivityService.executeAgentAction(
       code,
-      actionName || 'Ejecución Automática',
+      actionName || 'Automated Execution',
       userId
     );
 
     res.status(200).json({
-      message: `Acción ejecutada exitosamente para ${code}`,
+      message: `Action executed successfully for ${code}`,
       ...result,
     });
   } catch (error: any) {
     console.error('[ExecuteAgentAction Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al ejecutar acción de agente: ' + error.message,
+      error: 'Error executing agent action: ' + error.message,
     });
   }
 };
@@ -114,7 +115,7 @@ export const updateAgent = async (req: AuthRequest, res: Response): Promise<void
     const { instructions, status, name } = req.body;
 
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -123,7 +124,7 @@ export const updateAgent = async (req: AuthRequest, res: Response): Promise<void
     });
 
     if (!existingAgent) {
-      res.status(404).json({ success: false, error: 'Agente no encontrado' });
+      res.status(404).json({ success: false, error: 'Agent not found' });
       return;
     }
 
@@ -138,31 +139,32 @@ export const updateAgent = async (req: AuthRequest, res: Response): Promise<void
 
     res.status(200).json({
       success: true,
-      message: 'Agente actualizado exitosamente',
+      message: 'Agent updated successfully',
       agent: updatedAgent,
     });
   } catch (error: any) {
     console.error('[UpdateAgent Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al actualizar el agente: ' + error.message,
+      error: 'Error updating agent: ' + error.message,
     });
   }
 };
 
 export const chatWithPrincipalAgent = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { message } = req.body;
+    const { message, targetAgentCode } = req.body;
     const userId = req.user?.id;
 
     if (!message || typeof message !== 'string') {
-      res.status(400).json({ success: false, error: 'Mensaje es requerido' });
+      res.status(400).json({ success: false, error: 'Message is required' });
       return;
     }
 
     const result = await agentActivityService.chatWithPrincipalAgent({
       message,
       userId,
+      targetAgentCode,
     });
 
     res.status(200).json(result);
@@ -170,7 +172,69 @@ export const chatWithPrincipalAgent = async (req: AuthRequest, res: Response): P
     console.error('[ChatWithPrincipalAgent Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al procesar mensaje con el agente principal: ' + error.message,
+      error: 'Error processing message with principal agent: ' + error.message,
+    });
+  }
+};
+
+export const getChatHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' });
+      return;
+    }
+
+    const tasks = await prisma.task.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      include: {
+        agent: true,
+      },
+    });
+
+    const history = tasks.reverse().map((t) => {
+      const agentCode = (t.agent?.code || 'CEO') as 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+      const agentName = t.agent?.name || 'Alex Vance';
+      const avatar = t.agent?.avatar || 'char_0';
+
+      return {
+        id: t.id,
+        userMessage: t.title,
+        reply: t.result || t.description,
+        agentCode,
+        agentName,
+        avatar,
+        status: t.status,
+        createdAt: t.createdAt.toISOString(),
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      history,
+    });
+  } catch (error: any) {
+    console.error('[GetChatHistory Error]:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error fetching chat history: ' + error.message,
+    });
+  }
+};
+
+export const getMetaAiStatus = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const status = await metaAiService.testConnection();
+    res.status(200).json({
+      success: true,
+      data: status,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error testing Meta AI status: ' + error.message,
     });
   }
 };
@@ -186,7 +250,7 @@ export const getCoworkerRepositories = async (_req: AuthRequest, res: Response):
     console.error('[GetCoworkerRepositories Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener repositorios de GitHub: ' + error.message,
+      error: 'Error fetching GitHub repositories: ' + error.message,
     });
   }
 };
@@ -197,7 +261,7 @@ export const executeCoworkerRepoAction = async (req: AuthRequest, res: Response)
     const userId = req.user?.id;
 
     if (!repoName || !actionType) {
-      res.status(400).json({ success: false, error: 'repoName y actionType son requeridos' });
+      res.status(400).json({ success: false, error: 'repoName and actionType are required' });
       return;
     }
 
@@ -213,7 +277,7 @@ export const executeCoworkerRepoAction = async (req: AuthRequest, res: Response)
     console.error('[ExecuteCoworkerRepoAction Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al ejecutar acción de GitHub: ' + error.message,
+      error: 'Error executing GitHub action: ' + error.message,
     });
   }
 };
@@ -229,7 +293,7 @@ export const getSecretaryDriveFiles = async (_req: AuthRequest, res: Response): 
     console.error('[GetSecretaryDriveFiles Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener archivos de Google Drive: ' + error.message,
+      error: 'Error fetching Google Drive files: ' + error.message,
     });
   }
 };
@@ -240,7 +304,7 @@ export const executeSecretaryDriveAction = async (req: AuthRequest, res: Respons
     const userId = req.user?.id;
 
     if (!actionType) {
-      res.status(400).json({ success: false, error: 'actionType es requerido' });
+      res.status(400).json({ success: false, error: 'actionType is required' });
       return;
     }
 
@@ -256,7 +320,7 @@ export const executeSecretaryDriveAction = async (req: AuthRequest, res: Respons
     console.error('[ExecuteSecretaryDriveAction Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al ejecutar acción de Secretaria/Drive: ' + error.message,
+      error: 'Error executing Assistant/Drive action: ' + error.message,
     });
   }
 };
@@ -272,7 +336,7 @@ export const getManagerSystemHealth = async (_req: AuthRequest, res: Response): 
     console.error('[GetManagerSystemHealth Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener salud del sistema: ' + error.message,
+      error: 'Error fetching system health: ' + error.message,
     });
   }
 };
@@ -283,7 +347,7 @@ export const executeManagerAction = async (req: AuthRequest, res: Response): Pro
     const userId = req.user?.id;
 
     if (!actionType) {
-      res.status(400).json({ success: false, error: 'actionType es requerido' });
+      res.status(400).json({ success: false, error: 'actionType is required' });
       return;
     }
 
@@ -298,7 +362,7 @@ export const executeManagerAction = async (req: AuthRequest, res: Response): Pro
     console.error('[ExecuteManagerAction Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al ejecutar acción de Manager: ' + error.message,
+      error: 'Error executing Manager action: ' + error.message,
     });
   }
 };

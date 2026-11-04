@@ -8,7 +8,7 @@ export const getTasks = async (req: AuthRequest, res: Response): Promise<void> =
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -32,7 +32,7 @@ export const getTasks = async (req: AuthRequest, res: Response): Promise<void> =
     console.error('[GetTasks Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener las tareas: ' + error.message,
+      error: 'Error retrieving tasks: ' + error.message,
     });
   }
 };
@@ -42,7 +42,7 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<void>
     const userId = req.user?.id;
     const userEmail = req.user?.email || '';
     if (!userId) {
-      res.status(401).json({ success: false, error: 'No autorizado' });
+      res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
@@ -51,7 +51,7 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<void>
     if (!title || !description) {
       res.status(400).json({
         success: false,
-        error: 'Título y descripción son obligatorios.',
+        error: 'Title and description are required.',
       });
       return;
     }
@@ -84,7 +84,7 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<void>
       data: {
         taskId: task.id,
         status: 'INITIALIZED',
-        message: `Tarea creada y asignada a ${agent ? agent.name : 'cola de agentes'}. Modo: ${task.mode}`,
+        message: `Task created and assigned to ${agent ? agent.name : 'agent queue'}. Mode: ${task.mode}`,
       },
     });
 
@@ -104,8 +104,8 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<void>
           taskId: task.id,
           status: dispatchRes.dispatched ? 'N8N_DISPATCHED' : 'N8N_QUEUED_OFFLINE',
           message: dispatchRes.dispatched
-            ? `Evento de ejecución transmitido con éxito al flujo n8n (HTTP ${dispatchRes.n8nStatus})`
-            : `Servidor n8n no conectado activamente. Tarea registrada y lista para ejecución automática cuando se levante el webhook. (${dispatchRes.error || 'offline'})`,
+            ? `Execution event successfully transmitted to n8n workflow (HTTP ${dispatchRes.n8nStatus})`
+            : `n8n server not actively connected. Task recorded and queued for automatic execution once webhook is available. (${dispatchRes.error || 'offline'})`,
           rawPayload: dispatchRes.responseBody || null,
         },
       });
@@ -115,14 +115,14 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<void>
 
     res.status(201).json({
       success: true,
-      message: 'Tarea registrada exitosamente',
+      message: 'Task registered successfully',
       task,
     });
   } catch (error: any) {
     console.error('[CreateTask Error]:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al crear la tarea: ' + error.message,
+      error: 'Error creating task: ' + error.message,
     });
   }
 };

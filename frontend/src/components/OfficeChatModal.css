@@ -128,20 +128,178 @@
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-.chat-n8n-badge {
+.chat-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.chat-meta-badge {
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  letter-spacing: 0.2px;
+}
+
+.chat-db-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
   border-radius: 6px;
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  letter-spacing: 0.2px;
 }
 
-.chat-agent-desc {
-  margin: 0;
-  font-size: 0.8rem;
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-diagnostics-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-diagnostics-btn:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #f8fafc;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Agent Tabs Bar */
+.chat-agent-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.6rem 1.25rem;
+  background: #0b1120;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+  overflow-x: auto;
+}
+
+.tabs-header-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.agent-tabs-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.agent-tab-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.agent-tab-item:hover {
+  background: rgba(51, 65, 85, 0.7);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.agent-tab-item.active {
+  background: rgba(59, 130, 246, 0.18);
+  border: 1.5px solid #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+}
+
+.agent-tab-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  image-rendering: pixelated;
+  background: #1e293b;
+}
+
+.agent-tab-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.agent-tab-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.agent-tab-role {
+  font-size: 0.68rem;
   color: #94a3b8;
+}
+
+.chat-agent-item.active .agent-tab-name {
+  color: #60a5fa;
+}
+
+/* DB Alert */
+.chat-db-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.55rem 1.25rem;
+  background: rgba(16, 185, 129, 0.12);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: slideDown 0.2s ease-out;
+}
+
+.chat-loading-history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.8rem;
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .chat-close-btn {

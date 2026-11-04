@@ -173,7 +173,7 @@ function App() {
   const handleLoginSuccess = useCallback((user: User) => {
     setCurrentUser(user);
     setIsAuthModalOpen(false);
-    showToast(`Bienvenido ${user.name}. Sesión iniciada con éxito.`, 'success');
+    showToast(`Welcome ${user.name}. Successfully logged in.`, 'success');
 
     if (sceneInstance) {
       sceneInstance.setInputEnabled(true);
@@ -196,7 +196,7 @@ function App() {
         player.setVelocity(0, 0);
       }
     }
-    showToast('Has cerrado sesión. Acceso bloqueado hasta nuevo inicio de sesión.', 'info');
+    showToast('You have logged out. Access locked until next login.', 'info');
   }, [sceneInstance, showToast]);
 
   const handleSaveOffice = useCallback(async () => {
@@ -222,7 +222,7 @@ function App() {
       }));
 
       await api.saveOffice({
-        name: 'Oficina Central Sleeply',
+        name: 'Sleeply Central Office',
         currentMode: operatingMode,
         selectedAvatarId: selectedCharacterId || 'char_0',
         zoomLevel: currentZoom,
@@ -231,11 +231,11 @@ function App() {
       });
 
       setSaveStatus('saved');
-      showToast('Mobiliario guardado exitosamente en PostgreSQL', 'success');
+      showToast('Furniture layout saved successfully to PostgreSQL', 'success');
       setTimeout(() => setSaveStatus('idle'), 2500);
     } catch (err: any) {
       setSaveStatus('error');
-      showToast(`Error al guardar: ${err.message}`, 'error');
+      showToast(`Save failed: ${err.message}`, 'error');
       setTimeout(() => setSaveStatus('idle'), 3500);
     }
   }, [currentZoom, isGridVisible, operatingMode, sceneInstance, selectedCharacterId, showToast]);
@@ -282,12 +282,8 @@ function App() {
     };
 
     const handleAgentSelected = (code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO') => {
-      if (code === 'CEO') {
-        setIsChatOpen(true);
-      } else {
-        setSelectedAgentCode(code);
-        setIsN8nModalOpen(true);
-      }
+      setSelectedAgentCode(code);
+      setIsChatOpen(true);
     };
 
     gameInstance.events.on('mode-changed', handleModeChanged);
@@ -415,7 +411,7 @@ function App() {
 
       {/* Floating HUD Overlay */}
       {currentUser && (
-        <header className="minimal-hud" role="region" aria-label="Controles del entorno">
+        <header className="minimal-hud" role="region" aria-label="Environment controls">
           <div className="brand-container">
             <img
               src={sleeplyLogo}
@@ -426,22 +422,21 @@ function App() {
               type="button"
               className="brand-logout-btn auth-scale-button"
               onClick={handleLogout}
-              title="Cerrar sesión"
-              aria-label="Cerrar sesión"
+              title="Sign out"
+              aria-label="Sign out"
             >
               <PowerIcon size={18} />
             </button>
           </div>
 
-          <nav className="hud-actions" aria-label="Acciones principales">
-            {/* Únicamente cuando se esté editando aparece un solo botón de terminado con un chulito */}
+          <nav className="hud-actions" aria-label="Main actions">
             {isFurnitureMode ? (
               <button
                 type="button"
                 className="hud-pill-button done-btn auth-scale-button"
                 onClick={handleFinishDesign}
                 disabled={saveStatus === 'saving'}
-                title="Terminar y guardar cambios de mobiliario"
+                title="Finish and save furniture changes"
               >
                 <span className="btn-icon">
                   {saveStatus === 'saving' ? (
@@ -451,7 +446,7 @@ function App() {
                   )}
                 </span>
                 <span className="btn-label">
-                  {saveStatus === 'saving' ? 'Guardando...' : 'Terminado'}
+                  {saveStatus === 'saving' ? 'Saving...' : 'Done'}
                 </span>
               </button>
             ) : (
@@ -459,12 +454,12 @@ function App() {
                 type="button"
                 className="hud-pill-button catalog-btn"
                 onClick={handleToggleFurnitureMode}
-                title="Editar mobiliario de la oficina"
+                title="Edit office furniture"
               >
                 <span className="btn-icon">
                   <FurnitureIcon size={16} />
                 </span>
-                <span className="btn-label">Mobiliario</span>
+                <span className="btn-label">Furniture</span>
               </button>
             )}
 
@@ -473,24 +468,24 @@ function App() {
               type="button"
               className={`hud-pill-button chat-btn ${isChatOpen ? 'active' : ''}`}
               onClick={() => setIsChatOpen((prev) => !prev)}
-              title="Abrir Chat con Agente Principal (Alex Vance)"
-              aria-label="Abrir Chat con Agente Principal"
+              title="Open Principal Agent Chat (Alex Vance)"
+              aria-label="Open Principal Agent Chat"
             >
               <span className="btn-icon">
                 <ChatIcon size={16} />
               </span>
-              <span className="btn-label">Chat Agente Principal</span>
+              <span className="btn-label">Principal Agent Chat</span>
             </button>
 
             {/* Zoom Controls */}
-            <div className="zoom-controls" role="group" aria-label="Controles de zoom">
+            <div className="zoom-controls" role="group" aria-label="Zoom controls">
               <button
                 type="button"
                 className="hud-pill-button zoom-btn"
                 onClick={zoomOut}
                 disabled={currentZoom <= 0.75}
-                title="Alejar vista (Zoom-out)"
-                aria-label="Alejar vista"
+                title="Zoom out"
+                aria-label="Zoom out"
               >
                 −
               </button>
@@ -499,8 +494,8 @@ function App() {
                 className="hud-pill-button zoom-level-btn"
                 onClick={resetZoom}
                 disabled={currentZoom === 1.0}
-                title="Restablecer zoom al 100%"
-                aria-label="Restablecer zoom"
+                title="Reset zoom to 100%"
+                aria-label="Reset zoom"
               >
                 {Math.round(currentZoom * 100)}%
               </button>
@@ -509,8 +504,8 @@ function App() {
                 className="hud-pill-button zoom-btn"
                 onClick={zoomIn}
                 disabled={currentZoom >= 1.45}
-                title="Acercar vista (Zoom-in)"
-                aria-label="Acercar vista"
+                title="Zoom in"
+                aria-label="Zoom in"
               >
                 +
               </button>
@@ -522,17 +517,17 @@ function App() {
               className={`hud-pill-button mode-btn ${operatingMode === 'night' ? 'night' : 'day'}`}
               onClick={toggleMode}
               disabled={isTransitioning}
-              aria-label="Alternar entre modo día y noche"
+              aria-label="Toggle day and night mode"
             >
               <span className="btn-icon">
                 {operatingMode === 'day' ? <MoonIcon size={16} /> : <SunIcon size={16} />}
               </span>
               <span className="btn-label">
                 {isTransitioning
-                  ? 'Cambiando...'
+                  ? 'Switching...'
                   : operatingMode === 'day'
-                  ? 'Modo Noche'
-                  : 'Modo Día'}
+                  ? 'Night Mode'
+                  : 'Day Mode'}
               </span>
             </button>
           </nav>
@@ -545,27 +540,27 @@ function App() {
           <div className="placement-status">
             <span className="placement-pulsing-dot" />
             <span className="placement-instruction">
-              {activePlacing.isMoving ? 'Moviendo:' : 'Colocando:'}{' '}
+              {activePlacing.isMoving ? 'Moving:' : 'Placing:'}{' '}
               <strong>{activePlacing.name}</strong> ({activePlacing.footprint.width}x
               {activePlacing.footprint.height})
             </span>
-            <span className="placement-hint">— Haz clic en una casilla libre del piso</span>
+            <span className="placement-hint">— Click on an empty floor tile</span>
           </div>
 
           <button
             type="button"
             className="placement-cancel-btn"
             onClick={handleCancelPlacement}
-            title="Cancelar colocación (Esc)"
+            title="Cancel placement (Esc)"
           >
-            Cancelar (Esc)
+            Cancel (Esc)
           </button>
         </section>
       )}
 
       {/* Selected Object Context Floating Bar */}
       {selectedObject && !activePlacing && (
-        <section className="selected-object-bar" aria-label="Acciones de objeto seleccionado">
+        <section className="selected-object-bar" aria-label="Selected object actions">
           <div className="selected-info">
             <span className="selected-icon">
               <PinIcon size={15} />
@@ -582,25 +577,25 @@ function App() {
               type="button"
               className="selected-action-btn move"
               onClick={handleMoveSelected}
-              title="Mover este objeto a otra casilla"
+              title="Move this object to another tile"
             >
               <MoveIcon size={14} />
-              <span>Mover</span>
+              <span>Move</span>
             </button>
             <button
               type="button"
               className="selected-action-btn delete"
               onClick={handleRemoveSelected}
-              title="Eliminar este objeto (Supr)"
+              title="Delete this object (Del)"
             >
               <TrashIcon size={14} />
-              <span>Eliminar</span>
+              <span>Delete</span>
             </button>
             <button
               type="button"
               className="selected-action-btn close"
               onClick={handleDeselect}
-              title="Deseleccionar"
+              title="Deselect"
             >
               <CloseIcon size={14} />
             </button>
@@ -660,11 +655,20 @@ function App() {
         initialAgentCode={selectedAgentCode}
       />
 
-      {/* Principal Agent Conversational Chat */}
+      {/* Principal & Multi-Agent Conversational Chat powered by Meta AI & PostgreSQL */}
       <OfficeChatModal
         isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
+        onClose={() => {
+          setIsChatOpen(false);
+          gameInstance?.events.emit('request-hide-agent-bubbles');
+        }}
         gameInstance={gameInstance}
+        selectedAgentCode={selectedAgentCode}
+        onSelectAgent={(code) => setSelectedAgentCode(code)}
+        onOpenDiagnostics={() => {
+          setIsChatOpen(false);
+          setIsN8nModalOpen(true);
+        }}
       />
     </div>
   );

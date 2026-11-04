@@ -68,7 +68,7 @@ export class OpenClawService {
           connected: true,
           endpoint,
           statusCode: response.status,
-          message: 'Conectado exitosamente a OpenClaw en local (Puerto 18789)',
+          message: 'Successfully connected to local OpenClaw Gateway (Port 18789)',
           latencyMs,
           modelsCount: models.length,
           models,
@@ -80,7 +80,7 @@ export class OpenClawService {
         connected: false,
         endpoint,
         statusCode: response.status,
-        message: `OpenClaw Gateway respondió con error HTTP ${response.status}: ${response.statusText}`,
+        message: `OpenClaw Gateway responded with HTTP error ${response.status}: ${response.statusText}`,
         latencyMs,
         activeModel: env.OPENCLAW_MODEL,
       };
@@ -90,8 +90,8 @@ export class OpenClawService {
         connected: false,
         endpoint,
         message: error.name === 'AbortError'
-          ? 'Timeout al conectar con OpenClaw Gateway en local (> 4000ms)'
-          : `No se pudo conectar a OpenClaw en local: ${error.message}`,
+          ? 'Timeout connecting to local OpenClaw Gateway (> 4000ms)'
+          : `Could not connect to local OpenClaw Gateway: ${error.message}`,
         latencyMs,
         activeModel: env.OPENCLAW_MODEL,
       };
@@ -113,24 +113,24 @@ export class OpenClawService {
     const endpoint = env.OPENCLAW_BASE_URL;
     const token = env.OPENCLAW_TOKEN;
 
-    const systemPrompt = `Eres Alex Vance, CEO & Tech Lead de Sleeply y Orquestador Principal del equipo multiagente autónomo en la oficina virtual isométrica.
-Estás ejecutándote localmente conectado a través de OpenClaw Gateway con el modelo Meta AI (Muse Spark).
-Tu rol es responder y coordinar a tu equipo compuesto por:
-1. Sam Rivera (Co-worker / Software Engineer): Maneja repositorios GitHub (sleeply-core-engine, sleeply-web-office, meta-hackaton-agents), PRs, ramas y pruebas con Antigravity CLI.
-2. Taylor Chen (Secretaria Ejecutiva): Gestiona bandejas de Gmail (sansamablogers@gmail.com), sincroniza Google Calendar y minutas/entregables en Google Drive.
-3. Jordan Díaz (Manager de Operaciones): Monitoreo continuo de salud, base de datos PostgreSQL 17 (sleeply_db), Sentry (0 incidentes) y auditoría nocturna en Modo Sueño.
+    const systemPrompt = `You are Alex Vance, CEO & Tech Lead of Sleeply and Principal Orchestrator of the autonomous multi-agent team in the 2D isometric office.
+You are running locally connected via OpenClaw Gateway with the Meta AI model (Muse Spark).
+Your role is to respond and coordinate your team consisting of:
+1. Sam Rivera (Co-worker / Software Engineer): Manages GitHub repositories (sleeply-core-engine, sleeply-web-office, meta-hackaton-agents), PRs, branches, and Antigravity CLI tests.
+2. Taylor Chen (Executive Assistant): Manages Gmail inbox (sansamablogers@gmail.com), synchronizes Google Calendar, and updates Google Drive files and meeting minutes.
+3. Jordan Díaz (Operations Manager): Continuous system health monitoring, PostgreSQL 17 database (sleeply_db), Sentry (0 incidents), and night-shift Sleep Mode auditing.
 
-Modo actual de la oficina: ${params.operatingMode || 'day'}.
+Current office operating mode: ${params.operatingMode || 'day'}.
 
-Instrucciones de formato:
-- Responde de forma clara, profesional y concisa (1 o 2 párrafos).
-- Indica con precisión qué acción tomaste o a quién delegaste la tarea.
-- Al final de tu respuesta, SIEMPRE incluye un bloque exacto con este formato:
-BREVE REPORTE:
-- Agente Principal: Alex Vance (CEO) [OpenClaw Local]
-- Delegado a: [Alex Vance (CEO) | Sam Rivera (Co-worker) | Taylor Chen (Secretaria) | Jordan Díaz (Manager)]
-- Servicios: [GitHub | Gmail & Drive & Calendar | PostgreSQL & Sentry]
-- Estado: [100% coordinado | En ejecución | Tarea completada con éxito]`;
+Formatting instructions:
+- Respond clearly, professionally, and concisely (1 or 2 paragraphs).
+- Specify precisely what action was executed or to whom you delegated the task.
+- At the end of your response, ALWAYS include an exact block with this format:
+BRIEF REPORT:
+- Principal Agent: Alex Vance (CEO) [OpenClaw Local]
+- Delegated to: [Alex Vance (CEO) | Sam Rivera (Co-worker) | Taylor Chen (Executive Assistant) | Jordan Díaz (Operations Manager)]
+- Services: [GitHub | Gmail & Drive & Calendar | PostgreSQL & Sentry]
+- Status: [100% coordinated | In execution | Task completed successfully]`;
 
     try {
       const controller = new AbortController();
@@ -171,34 +171,34 @@ BREVE REPORTE:
       const lowerText = (content + ' ' + params.message).toLowerCase();
       let agentCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' = 'CEO';
       let agentName = 'Alex Vance';
-      let agentRole = 'CEO & Tech Lead / Agente Principal (OpenClaw)';
+      let agentRole = 'CEO & Tech Lead / Principal Agent (OpenClaw)';
       let avatar = 'char_0';
 
-      if (lowerText.includes('sam') || lowerText.includes('github') || lowerText.includes('pr') || lowerText.includes('commit') || lowerText.includes('código')) {
+      if (lowerText.includes('sam') || lowerText.includes('github') || lowerText.includes('pr') || lowerText.includes('commit') || lowerText.includes('code') || lowerText.includes('código')) {
         agentCode = 'COWORKER';
         agentName = 'Sam Rivera';
         agentRole = 'Co-worker / Software Engineer';
         avatar = 'char_1';
-      } else if (lowerText.includes('taylor') || lowerText.includes('gmail') || lowerText.includes('drive') || lowerText.includes('calendar') || lowerText.includes('correo')) {
+      } else if (lowerText.includes('taylor') || lowerText.includes('gmail') || lowerText.includes('drive') || lowerText.includes('calendar') || lowerText.includes('email') || lowerText.includes('correo')) {
         agentCode = 'ASSISTANT';
         agentName = 'Taylor Chen';
-        agentRole = 'Secretaria Ejecutiva';
+        agentRole = 'Executive Assistant';
         avatar = 'char_2';
-      } else if (lowerText.includes('jordan') || lowerText.includes('manager') || lowerText.includes('sentry') || lowerText.includes('postgres') || lowerText.includes('auditoría')) {
+      } else if (lowerText.includes('jordan') || lowerText.includes('manager') || lowerText.includes('sentry') || lowerText.includes('postgres') || lowerText.includes('audit') || lowerText.includes('auditoría')) {
         agentCode = 'MANAGER';
         agentName = 'Jordan Díaz';
-        agentRole = 'Manager de Operaciones';
+        agentRole = 'Operations Manager';
         avatar = 'char_3';
       }
 
       // Extract brief report if present
       let briefReport: string | undefined;
-      const reportIndex = content.indexOf('BREVE REPORTE:');
+      const reportIndex = content.indexOf('BRIEF REPORT:') !== -1 ? content.indexOf('BRIEF REPORT:') : content.indexOf('BREVE REPORTE:');
       if (reportIndex !== -1) {
         briefReport = content.slice(reportIndex).trim();
       } else {
         briefReport =
-          `BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO) [OpenClaw Local]\n- Delegado a: ${agentName}\n- Servicios: Local Gateway (127.0.0.1:18789) + Meta AI\n- Estado: 100% coordinado.`;
+          `BRIEF REPORT:\n- Principal Agent: Alex Vance (CEO) [OpenClaw Local]\n- Delegated to: ${agentName}\n- Services: Local Gateway (127.0.0.1:18789) + Meta AI\n- Status: 100% coordinated.`;
       }
 
       return {
@@ -209,8 +209,8 @@ BREVE REPORTE:
         agentRole,
         avatar,
         actionTaken: agentCode === 'CEO'
-          ? 'Orquestación procesada mediante OpenClaw Gateway (local)'
-          : `Delegado a ${agentName} vía OpenClaw Local Gateway`,
+          ? 'Orchestration processed via OpenClaw Gateway (local)'
+          : `Delegated to ${agentName} via OpenClaw Local Gateway`,
         briefReport,
         timestamp: new Date().toISOString(),
       };

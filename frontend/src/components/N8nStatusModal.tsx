@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  api,
-  type AgentLiveState,
-} from '../services/api';
+import { api, type AgentLiveState } from '../services/api';
 import {
   getCharacterById,
   CHARACTERS_CATALOG,
@@ -11,8 +8,8 @@ import {
 } from '../game/models/CharacterModel';
 import {
   CloseIcon,
-  AlertTriangleIcon,
   CheckCircleIcon,
+  AlertTriangleIcon,
   ZapIcon,
 } from './Icons';
 import './N8nStatusModal.css';
@@ -32,31 +29,35 @@ interface ActionButtonDef {
   icon: string;
 }
 
+interface ExecutionResultState {
+  actionTitle: string;
+  agent: string;
+  message: string;
+  response: string;
+  bubble: string;
+}
+
 export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
   isOpen,
   onClose,
   gameInstance,
-  initialAgentCode,
+  initialAgentCode = 'COWORKER',
 }) => {
-  const [selectedAgentCode, setSelectedAgentCode] = useState<string>(
-    initialAgentCode || 'COWORKER'
-  );
+  const [selectedAgentCode] = useState<'ASSISTANT' | 'COWORKER' | 'MANAGER'>(() => {
+    if (initialAgentCode === 'ASSISTANT' || initialAgentCode === 'MANAGER') {
+      return initialAgentCode;
+    }
+    return 'COWORKER';
+  });
+
   const [agentsActivity, setAgentsActivity] = useState<AgentLiveState[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [lastActionResult, setLastActionResult] = useState<ExecutionResultState | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lastActionResult, setLastActionResult] = useState<{
-    actionTitle: string;
-    agent: string;
-    message: string;
-    response: string;
-    bubble: string;
-  } | null>(null);
 
-  // Sync agent activity on open
   useEffect(() => {
     if (!isOpen) return;
-    const targetCode = initialAgentCode || 'COWORKER';
-    setSelectedAgentCode(targetCode);
+
     setLastActionResult(null);
     setError(null);
 
@@ -67,7 +68,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
       }
     }).catch((err) => {
       if (isMounted) {
-        setError('No se pudo sincronizar el estado: ' + err.message);
+        setError('Failed to synchronize status: ' + err.message);
       }
     });
 
@@ -94,43 +95,43 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         return [
           {
             id: 'send_email',
-            title: 'Enviar Notificación por Correo',
-            description: 'Envía un correo de notificación a sansamablogers@gmail.com a través del nodo Gmail.',
+            title: 'Send Email Notification',
+            description: 'Sends an email notification to sansamablogers@gmail.com via the Gmail node.',
             serviceBadge: 'Gmail (sansamablogers@gmail.com)',
             icon: '📧',
           },
           {
             id: 'gmail_triage',
-            title: 'Triage de Correos Urgentes',
-            description: 'Clasifica y audita correos prioritarios en sansamablogers@gmail.com con Meta AI.',
+            title: 'Urgent Email Triage',
+            description: 'Classifies and audits priority emails in sansamablogers@gmail.com with Meta AI.',
             serviceBadge: 'Gmail API',
             icon: '📬',
           },
           {
             id: 'update_drive',
-            title: 'Sincronizar Archivo en Google Drive',
-            description: 'Sube o actualiza la minuta ejecutiva en la carpeta Sleeply de Google Drive.',
+            title: 'Sync File to Google Drive',
+            description: 'Uploads or updates the executive summary in the Sleeply Google Drive folder.',
             serviceBadge: 'Google Drive API',
             icon: '📁',
           },
           {
             id: 'calendar_check',
-            title: 'Consultar Agenda en Google Calendar',
-            description: 'Revisa disponibilidad y días feriados en Google Calendar para sansamablogers@gmail.com.',
+            title: 'Check Schedule in Google Calendar',
+            description: 'Checks availability and events in Google Calendar for sansamablogers@gmail.com.',
             serviceBadge: 'Google Calendar API',
             icon: '📅',
           },
           {
             id: 'calendar_sync',
-            title: 'Agendar Reunión en Google Calendar',
-            description: 'Crea un nuevo bloque de coordinación ejecutiva en Google Calendar.',
+            title: 'Schedule Meeting in Google Calendar',
+            description: 'Creates a new executive coordination block in Google Calendar.',
             serviceBadge: 'Google Calendar API',
             icon: '🗓️',
           },
           {
             id: 'meta_google_summary',
-            title: 'Resumen Ejecutivo de Servicios Google',
-            description: 'Meta AI sintetiza el estado global de Gmail, Drive y Calendar.',
+            title: 'Google Services Executive Summary',
+            description: 'Meta AI synthesizes global status across Gmail, Drive, and Calendar.',
             serviceBadge: 'Meta AI Engine',
             icon: '🤖',
           },
@@ -140,29 +141,29 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         return [
           {
             id: 'commit_changes',
-            title: 'Crear Archivo y Commit en GitHub',
-            description: 'Aplica cambios y registra commit en GitHub para el usuario SantiSarmiento11.',
+            title: 'Create File & Commit to GitHub',
+            description: 'Applies changes and pushes commit to GitHub for user SantiSarmiento11.',
             serviceBadge: 'GitHub API (SantiSarmiento11)',
             icon: '🐙',
           },
           {
             id: 'list_repos',
-            title: 'Consultar Repositorios y Ramas',
-            description: 'Inspecciona sleeply-core-engine, sleeply-web-office y meta-hackaton-agents.',
+            title: 'Query Repositories & Branches',
+            description: 'Audits sleeply-core-engine, sleeply-web-office, and meta-hackaton-agents.',
             serviceBadge: 'GitHub API',
             icon: '🔍',
           },
           {
             id: 'review_pr',
-            title: 'Auditar PR #14 & Code Review',
-            description: 'Meta AI realiza auditoría de código del pull request y valida arquitectura.',
+            title: 'Audit PR #14 & Code Review',
+            description: 'Meta AI conducts pull request code review and validates architecture.',
             serviceBadge: 'Meta AI Code Engine',
             icon: '🛠️',
           },
           {
             id: 'run_cli_tests',
-            title: 'Ejecutar Tests Antigravity CLI',
-            description: 'Ejecuta suite de 24 pruebas automatizadas con reporte de verificación.',
+            title: 'Run Antigravity CLI Tests',
+            description: 'Executes suite of 24 automated tests with verification report.',
             serviceBadge: 'Antigravity CLI Runner',
             icon: '⚡',
           },
@@ -172,29 +173,29 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         return [
           {
             id: 'morning_report',
-            title: 'Compilar Reporte Matutino Ejecutivo',
-            description: 'Meta AI genera el resumen de salud operativa y disponibilidad del sistema.',
+            title: 'Compile Executive Morning Report',
+            description: 'Meta AI generates operational health and system uptime summary.',
             serviceBadge: 'Meta AI Reasoning',
             icon: '📊',
           },
           {
             id: 'postgres_audit',
-            title: 'Monitorear Base de Datos PostgreSQL',
-            description: 'Verifica estado de localhost:5432 / sleeply_db (tablas, bloqueos y conexiones).',
+            title: 'Audit PostgreSQL Database',
+            description: 'Verifies localhost:5432 / sleeply_db status (tables, locks, and active connections).',
             serviceBadge: 'PostgreSQL 17',
             icon: '🗄️',
           },
           {
             id: 'sentry_audit',
-            title: 'Auditoría de Alertas y Excepciones Sentry',
-            description: 'Supervisa métricas de salud (100% operativo, 0 incidentes críticos).',
+            title: 'Audit Sentry Alerts & Exceptions',
+            description: 'Monitors stability metrics (100% operational, 0 critical incidents).',
             serviceBadge: 'Sentry Monitor',
             icon: '🛡️',
           },
           {
             id: 'night_mode_sync',
-            title: 'Activar Supervisión en Modo Sueño',
-            description: 'Habilita el monitoreo nocturno continuo en segundo plano en n8n.',
+            title: 'Enable Night-Mode Supervision',
+            description: 'Activates continuous unattended background monitoring in n8n.',
             serviceBadge: 'Sleeply Background Engine',
             icon: '🌙',
           },
@@ -222,13 +223,13 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         res = await api.executeAgentAction(selectedAgentCode, btn.title);
       }
 
-      const bubbleText = res.state?.bubbleMessage || res.result?.bubbleMessage || 'Acción procesada con éxito';
-      const outputText = res.result?.metaAiResponse || res.result?.bubbleMessage || res.message || 'Ejecución exitosa';
+      const bubbleText = res.state?.bubbleMessage || res.result?.bubbleMessage || 'Action processed successfully';
+      const outputText = res.result?.metaAiResponse || res.result?.bubbleMessage || res.message || 'Execution successful';
 
       setLastActionResult({
         actionTitle: btn.title,
         agent: res.state?.name || selectedAgentCode,
-        message: res.message || 'Acción ejecutada exitosamente en n8n',
+        message: res.message || 'Action executed successfully in n8n',
         response: String(outputText),
         bubble: bubbleText,
       });
@@ -243,7 +244,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         }
       }
     } catch (err: any) {
-      setError(`Error al ejecutar acción: ${err.message}`);
+      setError(`Action execution failed: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
@@ -254,12 +255,12 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
   const currentAgent = agentsActivity.find((a) => a.code === selectedAgentCode) || {
     code: selectedAgentCode as any,
     name: selectedAgentCode === 'ASSISTANT' ? 'Taylor Chen' : selectedAgentCode === 'COWORKER' ? 'Sam Rivera' : 'Jordan Díaz',
-    role: selectedAgentCode === 'ASSISTANT' ? 'Secretaria / Servicios Google' : selectedAgentCode === 'COWORKER' ? 'Co-worker / GitHub & Desarrollo' : 'Manager / Supervisión & Salud',
+    role: selectedAgentCode === 'ASSISTANT' ? 'Secretary / Google Services' : selectedAgentCode === 'COWORKER' ? 'Co-worker / GitHub & Development' : 'Manager / Operations & Health',
     status: 'IDLE' as const,
-    activeWorkflow: selectedAgentCode === 'ASSISTANT' ? 'Sleeply - Secretaria Multi-Servicios (Taylor Chen)' : selectedAgentCode === 'COWORKER' ? 'Sleeply - Co-worker GitHub & Code Executor (Sam Rivera)' : 'Sleeply - Manager Nightly Monitor & Report (Jordan Díaz)',
+    activeWorkflow: selectedAgentCode === 'ASSISTANT' ? 'Sleeply - Multi-Service Secretary (Taylor Chen)' : selectedAgentCode === 'COWORKER' ? 'Sleeply - Co-worker GitHub & Code Executor (Sam Rivera)' : 'Sleeply - Manager Nightly Monitor & Report (Jordan Díaz)',
     workflowId: selectedAgentCode === 'ASSISTANT' ? 'L7na6CjNOcAp7p0U' : selectedAgentCode === 'COWORKER' ? '8OTbNua6EJpVLxxe' : 'LfN37IXa0dRtyXuo',
-    currentAction: 'Listo para recibir órdenes',
-    bubbleMessage: 'Servicios en línea y sincronizados con n8n',
+    currentAction: 'Ready to receive tasks',
+    bubbleMessage: 'Services online and synced with n8n',
     metaAiEndpoint: 'https://api.meta.ai/v1',
     lastUpdated: new Date().toISOString(),
     recentLogs: [],
@@ -279,13 +280,13 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
               <ZapIcon size={20} />
             </span>
             <div>
-              <h3 className="n8n-title">Acciones del Agente • {currentAgent.name}</h3>
+              <h3 className="n8n-title">Agent Actions • {currentAgent.name}</h3>
               <p className="n8n-subtitle">
-                Workflow n8n: <strong>{currentAgent.activeWorkflow}</strong>
+                n8n Workflow: <strong>{currentAgent.activeWorkflow}</strong>
               </p>
             </div>
           </div>
-          <button type="button" className="n8n-close-btn" onClick={onClose} aria-label="Cerrar">
+          <button type="button" className="n8n-close-btn" onClick={onClose} aria-label="Close">
             <CloseIcon size={18} />
           </button>
         </div>
@@ -323,7 +324,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
             <div className="action-success-header">
               <CheckCircleIcon size={18} />
               <strong>{lastActionResult.actionTitle}</strong>
-              <span className="action-success-badge">Completado</span>
+              <span className="action-success-badge">Completed</span>
             </div>
             <p className="action-success-text">{lastActionResult.response}</p>
           </div>
@@ -332,7 +333,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
         {/* ONLY BUTTONS SECTION */}
         <div className="agent-buttons-container">
           <h4 className="agent-buttons-title">
-            Opciones del Workflow (Haz clic en un botón para ejecutar):
+            Workflow Options (Click a button to execute):
           </h4>
 
           <div className="agent-action-buttons-grid">
@@ -355,7 +356,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
                   {isLoading && (
                     <div className="card-btn-spinner-overlay">
                       <span className="n8n-spinner" />
-                      <span>Ejecutando en n8n...</span>
+                      <span>Executing in n8n...</span>
                     </div>
                   )}
                 </button>
@@ -366,7 +367,7 @@ export const N8nStatusModal: React.FC<N8nStatusModalProps> = ({
 
         {/* Footer info note */}
         <div className="agent-buttons-footer">
-          <span>Servicios configurados: GitHub (SantiSarmiento11) • Gmail & Calendar & Drive (sansamablogers@gmail.com) • Meta AI Engine</span>
+          <span>Configured Services: GitHub (SantiSarmiento11) • Gmail, Calendar & Drive (sansamablogers@gmail.com) • Meta AI Engine</span>
         </div>
       </div>
     </div>

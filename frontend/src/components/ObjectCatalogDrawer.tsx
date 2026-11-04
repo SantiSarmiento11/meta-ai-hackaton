@@ -36,9 +36,9 @@ interface AtlasTab {
 }
 
 const ATLAS_TABS: AtlasTab[] = [
-  { id: 'all', label: 'Todos', badge: 160 },
-  { id: 'tech_office_atlas', label: 'Oficina Tecnológica', badge: 78 },
-  { id: 'modern_office_atlas', label: 'Oficina Moderna', badge: 82 },
+  { id: 'all', label: 'All', badge: 160 },
+  { id: 'tech_office_atlas', label: 'Tech Office', badge: 78 },
+  { id: 'modern_office_atlas', label: 'Modern Office', badge: 82 },
 ];
 
 interface CategoryTab {
@@ -47,14 +47,14 @@ interface CategoryTab {
 }
 
 const CATEGORY_TABS: CategoryTab[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'desk', label: 'Escritorios' },
-  { id: 'chair', label: 'Sillas' },
-  { id: 'seating', label: 'Sofás / Lounge' },
-  { id: 'storage', label: 'Archivadores & Racks' },
-  { id: 'electronics', label: 'Tecnología' },
-  { id: 'decoration', label: 'Plantas & Dec.' },
-  { id: 'accessory', label: 'Accesorios' },
+  { id: 'all', label: 'All' },
+  { id: 'desk', label: 'Desks' },
+  { id: 'chair', label: 'Chairs' },
+  { id: 'seating', label: 'Sofas / Lounge' },
+  { id: 'storage', label: 'Storage & Racks' },
+  { id: 'electronics', label: 'Electronics' },
+  { id: 'decoration', label: 'Plants & Decor' },
+  { id: 'accessory', label: 'Accessories' },
 ];
 
 const renderCategoryIcon = (category: CategoryFilter) => {
@@ -109,7 +109,7 @@ export const ObjectCatalogDrawer = ({
   return (
     <aside
       className="catalog-drawer-overlay"
-      aria-label="Catálogo de Mobiliario y Equipamiento"
+      aria-label="Furniture & Equipment Catalog"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -120,9 +120,9 @@ export const ObjectCatalogDrawer = ({
         {/* Header */}
         <header className="catalog-header">
           <div className="catalog-title-group">
-            <h2 className="catalog-title">Catálogo de Mobiliario Sleeply</h2>
+            <h2 className="catalog-title">Sleeply Furniture Catalog</h2>
             <span className="catalog-subtitle">
-              {filteredObjects.length} de {OFFICE_OBJECTS_CATALOG.length} objetos disponibles
+              {filteredObjects.length} of {OFFICE_OBJECTS_CATALOG.length} objects available
             </span>
           </div>
 
@@ -131,21 +131,21 @@ export const ObjectCatalogDrawer = ({
               type="button"
               className="catalog-tool-btn danger"
               onClick={() => {
-                if (window.confirm('¿Deseas eliminar todos los objetos colocados en la oficina?')) {
+                if (window.confirm('Do you want to clear all placed objects in the office?')) {
                   onClearAll();
                 }
               }}
-              title="Limpiar todos los objetos del piso"
+              title="Clear all floor objects"
             >
               <TrashIcon size={14} />
-              <span className="btn-label">Limpiar Todo</span>
+              <span className="btn-label">Clear All</span>
             </button>
 
             <button
               type="button"
               className="catalog-close-btn"
               onClick={onClose}
-              aria-label="Cerrar catálogo"
+              aria-label="Close catalog"
             >
               <CloseIcon size={18} />
             </button>
@@ -155,7 +155,7 @@ export const ObjectCatalogDrawer = ({
         {/* Filter controls */}
         <div className="catalog-controls">
           {/* Atlas Collection Filter */}
-          <div className="catalog-atlas-tabs" role="tablist" aria-label="Filtro por colección de spritesheet">
+          <div className="catalog-atlas-tabs" role="tablist" aria-label="Filter by spritesheet collection">
             {ATLAS_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -176,7 +176,7 @@ export const ObjectCatalogDrawer = ({
             <input
               type="text"
               className="catalog-search-input"
-              placeholder="Buscar por nombre (ej. estación, escritorio, rack, silla)..."
+              placeholder="Search by name (e.g. workstation, desk, rack, chair)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -192,7 +192,7 @@ export const ObjectCatalogDrawer = ({
           </div>
 
           {/* Category tabs */}
-          <nav className="catalog-category-tabs" aria-label="Filtro por categoría">
+          <nav className="catalog-category-tabs" aria-label="Filter by category">
             {CATEGORY_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -211,7 +211,7 @@ export const ObjectCatalogDrawer = ({
         <div className="catalog-items-grid">
           {filteredObjects.length === 0 ? (
             <div className="catalog-empty-state">
-              <p>No se encontraron objetos que coincidan con la búsqueda y filtros seleccionados.</p>
+              <p>No objects found matching the selected search query and filters.</p>
             </div>
           ) : (
             filteredObjects.map((item: OfficeObjectDefinition) => {
@@ -221,7 +221,7 @@ export const ObjectCatalogDrawer = ({
                   key={item.id}
                   className={`catalog-item-card ${isSelected ? 'placing' : ''}`}
                   onClick={() => onStartPlacement(item.id)}
-                  title={`Clic para colocar: ${item.name} (${item.footprint.width}x${item.footprint.height})`}
+                  title={`Click to place: ${item.name} (${item.footprint.width}x${item.footprint.height})`}
                 >
                   <div className="card-thumb-container">
                     <img
@@ -244,7 +244,7 @@ export const ObjectCatalogDrawer = ({
                     type="button"
                     className={`card-place-btn ${isSelected ? 'active' : ''}`}
                   >
-                    {isSelected ? 'Colocando...' : 'Ubicar'}
+                    {isSelected ? 'Placing...' : 'Place'}
                   </button>
                 </div>
               );

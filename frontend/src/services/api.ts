@@ -82,6 +82,8 @@ export interface ChatMessage {
   text: string;
   actionTaken?: string;
   briefReport?: string;
+  dbConnected?: boolean;
+  dbStats?: any;
   timestamp: string;
 }
 
@@ -94,6 +96,8 @@ export interface ChatResponse {
   avatar: string;
   actionTaken?: string;
   briefReport?: string;
+  dbConnected?: boolean;
+  dbStats?: any;
   timestamp: string;
 }
 
@@ -194,7 +198,7 @@ class ApiService {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || `Error en la solicitud: ${response.statusText}`);
+      throw new Error(data.error || `Request failed: ${response.statusText}`);
     }
 
     return data;
@@ -274,13 +278,32 @@ class ApiService {
     return res;
   }
 
-  // Conversational Chat with Principal Agent (Alex Vance / CEO)
-  public async chatWithPrincipalAgent(message: string): Promise<ChatResponse> {
+  // Conversational Chat with AI Agents powered by Meta AI (.env) & PostgreSQL DB
+  public async chatWithPrincipalAgent(message: string, targetAgentCode?: string): Promise<ChatResponse> {
     const res = await this.request<ChatResponse>('/agents/chat', {
       method: 'POST',
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, targetAgentCode }),
     });
     return res;
+  }
+
+  public async getChatHistory(): Promise<Array<{
+    id: string;
+    userMessage: string;
+    reply: string;
+    agentCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER';
+    agentName: string;
+    avatar: string;
+    status: string;
+    createdAt: string;
+  }>> {
+    const res = await this.request<{ success: boolean; history: any[] }>('/agents/chat/history');
+    return res.history;
+  }
+
+  public async getMetaAiStatus(): Promise<any> {
+    const res = await this.request<{ success: boolean; data: any }>('/agents/meta-ai/status');
+    return res.data;
   }
 
   // Co-worker: GitHub Repositories & Actions

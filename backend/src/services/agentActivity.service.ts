@@ -1,6 +1,8 @@
 import { env } from '../config/env';
 import { prisma } from '../database/prisma';
 import { n8nService } from './n8n.service';
+import { openClawService } from './openclaw.service';
+import { metaAiService } from './metaAi.service';
 
 export interface AgentLiveState {
   code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO';
@@ -31,73 +33,73 @@ class AgentActivityService {
       role: 'CEO & Tech Lead',
       avatar: 'char_0',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Secretaria Servicios Google (Taylor Chen)',
+      activeWorkflow: 'Sleeply - Google Services Executive Assistant (Taylor Chen)',
       workflowId: 'Y98OZScIcjwGqq5d',
-      currentAction: 'Dirección general y orquestación estratégica',
-      bubbleMessage: 'Oficina conectada: Supervisión y arquitectura activas',
+      currentAction: 'General management and strategic orchestration',
+      bubbleMessage: 'Office connected: Supervision and architecture active',
       metaAiEndpoint: 'https://api.meta.ai/v1',
       lastUpdated: new Date().toISOString(),
       recentLogs: [
-        'Conectado al workflow Central Agent Orchestrator y Conversational AI Agent en n8n',
-        'Modelo Meta AI (https://api.meta.ai/v1) inicializado',
-        'Supervisión y ruteo estratégico de tareas activo',
+        'Connected to Central Agent Orchestrator and Conversational AI Agent in n8n',
+        'Meta AI model (https://api.meta.ai/v1) initialized',
+        'Supervision and strategic task routing active',
       ],
     });
 
     this.agentStates.set('ASSISTANT', {
       code: 'ASSISTANT',
       name: 'Taylor Chen',
-      role: 'Secretaria / Asistente',
+      role: 'Executive Assistant',
       avatar: 'char_2',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Secretaria Servicios Google (Taylor Chen)',
+      activeWorkflow: 'Sleeply - Google Services Executive Assistant (Taylor Chen)',
       workflowId: 'Y98OZScIcjwGqq5d',
-      currentAction: 'Monitoreando correos entrantes de Gmail',
-      bubbleMessage: 'Bandeja sincronizada: Sin correos urgentes pendientes',
+      currentAction: 'Monitoring incoming Gmail messages and calendar schedules',
+      bubbleMessage: 'Inbox synchronized: No urgent unread messages pending',
       metaAiEndpoint: 'https://api.meta.ai/v1',
       lastUpdated: new Date().toISOString(),
       recentLogs: [
-        'Conectado al workflow OGiWBz0XS8YCKsV7 en n8n',
-        'Modelo Meta AI (https://api.meta.ai/v1) inicializado',
-        'Filtro de correo Gmail y Google Calendar activo',
+        'Connected to workflow OGiWBz0XS8YCKsV7 in n8n',
+        'Meta AI model (https://api.meta.ai/v1) initialized',
+        'Gmail filter and Google Calendar monitor active',
       ],
     });
 
     this.agentStates.set('COWORKER', {
       code: 'COWORKER',
       name: 'Sam Rivera',
-      role: 'Co-worker / Desarrollador',
+      role: 'Co-worker / Software Engineer',
       avatar: 'char_1',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Co-worker GitHub & Desarrollo (Sam Rivera)',
+      activeWorkflow: 'Sleeply - Co-worker GitHub & Development (Sam Rivera)',
       workflowId: '0J1BLgM3KzQOD4f3',
-      currentAction: 'Listo para recibir requerimientos en GitHub',
-      bubbleMessage: 'Repositorio inspeccionado: 0 conflictos en ramas',
+      currentAction: 'Ready to receive engineering requirements on GitHub',
+      bubbleMessage: 'Repository inspected: 0 branch conflicts',
       metaAiEndpoint: 'https://api.meta.ai/v1',
       lastUpdated: new Date().toISOString(),
       recentLogs: [
-        'Conectado al workflow CkATRASNrEraPrfQ en n8n',
-        'Antigravity CLI runner preparado para pruebas locales',
-        'Conexión PostgreSQL lista para análisis de esquema',
+        'Connected to workflow CkATRASNrEraPrfQ in n8n',
+        'Antigravity CLI runner ready for local testing suites',
+        'PostgreSQL connection verified for schema inspection',
       ],
     });
 
     this.agentStates.set('MANAGER', {
       code: 'MANAGER',
       name: 'Jordan Díaz',
-      role: 'Manager / Supervisor',
+      role: 'Operations Manager',
       avatar: 'char_3',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Manager Monitoreo & Supervisión (Jordan Díaz)',
+      activeWorkflow: 'Sleeply - Manager Monitoring & Supervision (Jordan Díaz)',
       workflowId: 'aMq0v6FgezOyhvHH',
-      currentAction: 'Supervisión de salud del sistema',
-      bubbleMessage: 'Sistema 100% saludable: Preparando reporte matutino',
+      currentAction: 'Supervising system health and automated telemetry',
+      bubbleMessage: 'System 100% healthy: Compiling morning audit report',
       metaAiEndpoint: 'https://api.meta.ai/v1',
       lastUpdated: new Date().toISOString(),
       recentLogs: [
-        'Conectado al workflow zINHYbE6372bGGJW en n8n',
-        'Monitoreo PostgreSQL y Sentry inicializado',
-        'Canal de notificaciones Telegram activo',
+        'Connected to workflow zINHYbE6372bGGJW in n8n',
+        'PostgreSQL and Sentry monitoring initialized',
+        'Telegram notification channel operational',
       ],
     });
   }
@@ -122,7 +124,7 @@ class AgentActivityService {
     const existing = this.agentStates.get(code);
 
     if (!existing) {
-      throw new Error(`Agente con código ${code} no encontrado.`);
+      throw new Error(`Agent with code ${code} not found.`);
     }
 
     if (payload.status) existing.status = payload.status;
@@ -153,22 +155,22 @@ class AgentActivityService {
     const state = this.agentStates.get(code);
 
     if (!state) {
-      throw new Error(`Código de agente inválido: ${agentCode}`);
+      throw new Error(`Invalid agent code: ${agentCode}`);
     }
 
     state.status = 'WORKING';
-    state.currentAction = `Ejecutando acción: ${actionName}`;
-    state.bubbleMessage = `Procesando: ${actionName}...`;
+    state.currentAction = `Executing action: ${actionName}`;
+    state.bubbleMessage = `Processing: ${actionName}...`;
     state.lastUpdated = new Date().toISOString();
 
-    // Disparar flujo en n8n de forma asíncrona hacia el agente correspondiente
+    // Dispatch workflow asynchronously to corresponding agent in n8n
     const dispatchResult = await n8nService.dispatchToAgent(code, {
       userId: userId || 'system_operator',
       userEmail: 'operator@sleeply.local',
       agentCode: code,
       agentName: state.name,
       taskTitle: actionName,
-      taskDescription: `Acción disparada desde Sleeply UI para ${state.name}`,
+      taskDescription: `Action triggered from Sleeply UI for ${state.name}`,
       operatingMode: 'awake',
       timestamp: new Date().toISOString(),
     });
@@ -178,10 +180,10 @@ class AgentActivityService {
 
     if (dispatchResult.dispatched && n8nBody?.success) {
       state.status = 'SUCCESS';
-      state.bubbleMessage = n8nBody.bubbleMessage || 'Acción procesada exitosamente con Meta AI';
-      state.currentAction = n8nBody.currentAction || `Acción '${actionName}' finalizada`;
+      state.bubbleMessage = n8nBody.bubbleMessage || 'Action processed successfully with Meta AI';
+      state.currentAction = n8nBody.currentAction || `Action '${actionName}' finalized`;
       state.recentLogs.unshift(
-        `[${new Date().toLocaleTimeString()}] Meta AI (${state.workflowId}): ${n8nBody.bubbleMessage || 'Ejecución exitosa'}`
+        `[${new Date().toLocaleTimeString()}] Meta AI (${state.workflowId}): ${n8nBody.bubbleMessage || 'Successful execution'}`
       );
       if (state.recentLogs.length > 8) state.recentLogs.pop();
 
@@ -195,12 +197,12 @@ class AgentActivityService {
         executionTimestamp: n8nBody.timestamp || new Date().toISOString(),
       };
     } else {
-      // Fallback si n8n no responde o la red falla
+      // Fallback if n8n is unreachable or offline
       state.status = 'SUCCESS';
-      state.bubbleMessage = `Acción '${actionName}' procesada en entorno local`;
-      state.currentAction = `Acción '${actionName}' completada`;
+      state.bubbleMessage = `Action '${actionName}' processed in local environment`;
+      state.currentAction = `Action '${actionName}' completed`;
       state.recentLogs.unshift(
-        `[${new Date().toLocaleTimeString()}] Acción '${actionName}' ejecutada localmente (n8n no accesible en este instante)`
+        `[${new Date().toLocaleTimeString()}] Action '${actionName}' executed locally (n8n offline at this instant)`
       );
       if (state.recentLogs.length > 8) state.recentLogs.pop();
 
@@ -209,11 +211,10 @@ class AgentActivityService {
         workflow: state.activeWorkflow,
         workflowId: state.workflowId,
         n8nDispatched: false,
-        metaAiResponse: `Ejecución local para ${state.name}: ${actionName}. Servicio Meta AI activo en https://api.meta.ai/v1.`,
+        metaAiResponse: `Local execution for ${state.name}: ${actionName}. Meta AI active at https://api.meta.ai/v1.`,
         bubbleMessage: state.bubbleMessage,
       };
     }
-
 
     // Persist log in DB if userId provided
     if (userId) {
@@ -228,7 +229,7 @@ class AgentActivityService {
               userId,
               agentId: agent.id,
               title: actionName,
-              description: `Automatización n8n disparada para ${state.name}`,
+              description: `n8n automation triggered for ${state.name}`,
               status: 'COMPLETED',
               result: JSON.stringify(finalResult),
             },
@@ -238,7 +239,7 @@ class AgentActivityService {
             data: {
               taskId: task.id,
               status: 'SUCCESS',
-              message: `Ejecutado con Meta AI API en ${state.metaAiEndpoint}`,
+              message: `Executed with Meta AI API at ${state.metaAiEndpoint}`,
               rawPayload: finalResult as any,
             },
           });
@@ -263,6 +264,7 @@ class AgentActivityService {
   public async chatWithPrincipalAgent(payload: {
     message: string;
     userId?: string;
+    targetAgentCode?: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' | string;
   }): Promise<{
     success: boolean;
     reply: string;
@@ -272,15 +274,120 @@ class AgentActivityService {
     avatar: string;
     actionTaken?: string;
     briefReport?: string;
+    dbConnected?: boolean;
+    dbStats?: any;
     timestamp: string;
   }> {
+    const rawTarget = (payload.targetAgentCode || 'CEO').toUpperCase();
     const ceoState = this.agentStates.get('CEO')!;
-    ceoState.status = 'WORKING';
-    ceoState.currentAction = `Procesando consulta: ${payload.message.slice(0, 50)}`;
-    ceoState.bubbleMessage = `Orquestando solicitud: "${payload.message.slice(0, 40)}"`;
-    ceoState.lastUpdated = new Date().toISOString();
+    const activeState = this.agentStates.get(rawTarget) || ceoState;
 
-    // Disparar flujo al Orquestador Central de n8n
+    activeState.status = 'WORKING';
+    activeState.currentAction = `Processing request: ${payload.message.slice(0, 50)}`;
+    activeState.bubbleMessage = `Handling: "${payload.message.slice(0, 40)}"`;
+    activeState.lastUpdated = new Date().toISOString();
+
+    // 1. Direct orchestration with Meta AI (using META_AI_API_KEY from .env and connected to PostgreSQL)
+    try {
+      const metaAiResult = await metaAiService.chatCompletion({
+        message: payload.message,
+        targetAgentCode: payload.targetAgentCode,
+        userId: payload.userId,
+      });
+
+      if (metaAiResult && metaAiResult.success) {
+        const respondingCode = metaAiResult.agentCode;
+        const respondingState = this.agentStates.get(respondingCode) || activeState;
+
+        respondingState.status = 'SUCCESS';
+        respondingState.bubbleMessage = `Addressed request: "${metaAiResult.reply.slice(0, 45).replace(/\n/g, ' ')}..."`;
+        respondingState.currentAction = metaAiResult.actionTaken || 'Request processed with Meta AI';
+        respondingState.lastUpdated = new Date().toISOString();
+        respondingState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Meta AI: ${respondingState.currentAction}`);
+        if (respondingState.recentLogs.length > 8) respondingState.recentLogs.pop();
+
+        if (respondingCode !== 'CEO') {
+          ceoState.status = 'SUCCESS';
+          ceoState.bubbleMessage = `Request coordinated to ${respondingState.name}`;
+          ceoState.currentAction = `Delegated task to ${respondingState.name} (Meta AI)`;
+          ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Coordinated with ${respondingState.name}`);
+          if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
+        }
+
+        return metaAiResult;
+      }
+    } catch (metaAiErr: any) {
+      console.warn('[Meta AI Chat Orchestration Error, falling back to secondary providers]:', metaAiErr.message);
+    }
+
+    // 2. Real-time orchestration with OpenClaw locally (Gateway 18789 + Meta AI)
+    try {
+      const openClawResult = await openClawService.chatCompletion({
+        message: payload.message,
+        userId: payload.userId,
+        operatingMode: 'day',
+      });
+
+      if (openClawResult && openClawResult.success) {
+        const respondingCode = openClawResult.agentCode;
+        const respondingState = this.agentStates.get(respondingCode) || ceoState;
+
+        respondingState.status = 'SUCCESS';
+        respondingState.bubbleMessage = `Addressed request: "${openClawResult.reply.slice(0, 45)}..."`;
+        respondingState.currentAction = openClawResult.actionTaken || 'Request processed with OpenClaw';
+        respondingState.lastUpdated = new Date().toISOString();
+        respondingState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] OpenClaw: ${respondingState.currentAction}`);
+        if (respondingState.recentLogs.length > 8) respondingState.recentLogs.pop();
+
+        if (respondingCode !== 'CEO') {
+          ceoState.status = 'SUCCESS';
+          ceoState.bubbleMessage = `Request orchestrated via OpenClaw to ${respondingState.name}`;
+          ceoState.currentAction = `Delegated task to ${respondingState.name} (OpenClaw Local)`;
+          ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] OpenClaw delegated to ${respondingState.name}`);
+          if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
+        } else {
+          ceoState.status = 'SUCCESS';
+          ceoState.bubbleMessage = 'OpenClaw orchestration report generated';
+          ceoState.currentAction = 'Request completed in local OpenClaw Gateway';
+        }
+
+        if (payload.userId) {
+          try {
+            const agent = await prisma.agent.findFirst({
+              where: { userId: payload.userId, code: respondingCode as any },
+            });
+            if (agent) {
+              const task = await prisma.task.create({
+                data: {
+                  userId: payload.userId,
+                  agentId: agent.id,
+                  title: payload.message.slice(0, 100),
+                  description: 'Conversational chat orchestrated with local OpenClaw (Meta AI)',
+                  status: 'COMPLETED',
+                  result: JSON.stringify(openClawResult),
+                },
+              });
+              await prisma.taskExecutionLog.create({
+                data: {
+                  taskId: task.id,
+                  status: 'SUCCESS',
+                  message: 'Successfully orchestrated with OpenClaw Gateway (127.0.0.1:18789)',
+                  rawPayload: openClawResult as any,
+                },
+              });
+            }
+          } catch (dbErr: any) {
+            console.warn('[chatWithPrincipalAgent OpenClaw DB Log Error]:', dbErr.message);
+          }
+        }
+
+        return openClawResult;
+      }
+    } catch (openClawErr: any) {
+      console.warn('[OpenClaw Chat Orchestration Error, falling back to n8n]:', openClawErr.message);
+    }
+
+    // 3. Dispatch workflow to Central n8n Orchestrator
     const dispatchResult = await n8nService.dispatchToN8n({
       userId: payload.userId || 'system_operator',
       userEmail: 'operator@sleeply.local',
@@ -301,22 +408,22 @@ class AgentActivityService {
       if (resBody.bubbleMessage) respondingState.bubbleMessage = resBody.bubbleMessage;
       if (resBody.currentAction) respondingState.currentAction = resBody.currentAction;
       respondingState.lastUpdated = new Date().toISOString();
-      respondingState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] ${resBody.bubbleMessage || 'Consulta atendida'}`);
+      respondingState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] ${resBody.bubbleMessage || 'Request fulfilled'}`);
       if (respondingState.recentLogs.length > 8) respondingState.recentLogs.pop();
 
       if (respondingCode !== 'CEO') {
         ceoState.status = 'SUCCESS';
-        ceoState.bubbleMessage = `Instrucción orquestada hacia ${respondingState.name}`;
-        ceoState.currentAction = `Delegó tarea a ${respondingState.name}`;
-        ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Delegó a ${respondingState.name} (${respondingState.activeWorkflow})`);
+        ceoState.bubbleMessage = `Instruction orchestrated to ${respondingState.name}`;
+        ceoState.currentAction = `Delegated task to ${respondingState.name}`;
+        ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Delegated to ${respondingState.name} (${respondingState.activeWorkflow})`);
         if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
       } else {
         ceoState.status = 'SUCCESS';
-        ceoState.bubbleMessage = resBody.bubbleMessage || 'Reporte de orquestación central emitido';
-        ceoState.currentAction = 'Atención en Chat Central completada';
+        ceoState.bubbleMessage = resBody.bubbleMessage || 'Central orchestration report generated';
+        ceoState.currentAction = 'Principal chat request completed';
       }
 
-      // Persistir en PostgreSQL si userId está disponible
+      // Persist in PostgreSQL if userId available
       if (payload.userId) {
         try {
           const agent = await prisma.agent.findFirst({
@@ -328,7 +435,7 @@ class AgentActivityService {
                 userId: payload.userId,
                 agentId: agent.id,
                 title: payload.message.slice(0, 100),
-                description: `Chat conversacional orquestado para ${respondingState.name}`,
+                description: `Conversational chat orchestrated for ${respondingState.name}`,
                 status: 'COMPLETED',
                 result: JSON.stringify(resBody),
               },
@@ -337,7 +444,7 @@ class AgentActivityService {
               data: {
                 taskId: task.id,
                 status: 'SUCCESS',
-                message: `Orquestado exitosamente con Meta AI (${resBody.activeWorkflow || respondingState.activeWorkflow})`,
+                message: `Successfully orchestrated with Meta AI (${resBody.activeWorkflow || respondingState.activeWorkflow})`,
                 rawPayload: resBody as any,
               },
             });
@@ -348,49 +455,48 @@ class AgentActivityService {
       }
 
       const actionTaken = respondingCode === 'CEO'
-        ? 'Orquestación general procesada'
-        : `Delegado a ${respondingState.name} (${respondingState.activeWorkflow})`;
+        ? 'General orchestration processed'
+        : `Delegated to ${respondingState.name} (${respondingState.activeWorkflow})`;
 
       return {
         success: true,
-        reply: resBody.output || resBody.bubbleMessage || 'Instrucción procesada con éxito.',
+        reply: resBody.output || resBody.bubbleMessage || 'Instruction processed successfully.',
         agentCode: respondingCode,
         agentName: respondingState.name,
         agentRole: respondingState.role,
         avatar: respondingState.avatar,
         actionTaken,
-        briefReport: resBody.briefReport || (resBody.output?.includes('BREVE REPORTE:') ? resBody.output.slice(resBody.output.indexOf('BREVE REPORTE:')) : 'BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO)\n- Servicios: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 flujos activos con Meta AI\n- Estado: 100% operativo.'),
+        briefReport: resBody.briefReport || (resBody.output?.includes('BRIEF REPORT:') ? resBody.output.slice(resBody.output.indexOf('BRIEF REPORT:')) : 'BRIEF REPORT:\n- Principal Agent: Alex Vance (CEO)\n- Services: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 active workflows with Meta AI\n- Status: 100% operational.'),
         timestamp: resBody.timestamp || new Date().toISOString(),
       };
     }
 
-    // Fallback resiliente si n8n no responde o hay fallo de red
+    // Resilient fallback if n8n is offline or network fails
     const text = (payload.message || '').toLowerCase();
     let fallbackCode: 'CEO' | 'COWORKER' | 'ASSISTANT' | 'MANAGER' = 'CEO';
-    if (text.includes('github') || text.includes('repo') || text.includes('rama') || text.includes('código') || text.includes('pr') || text.includes('commit') || text.includes('test') || text.includes('sam')) {
+    if (text.includes('github') || text.includes('repo') || text.includes('branch') || text.includes('code') || text.includes('pr') || text.includes('commit') || text.includes('test') || text.includes('sam')) {
       fallbackCode = 'COWORKER';
-    } else if (text.includes('correo') || text.includes('email') || text.includes('gmail') || text.includes('calendar') || text.includes('agenda') || text.includes('drive') || text.includes('minuta') || text.includes('taylor') || text.includes('secretaria')) {
+    } else if (text.includes('mail') || text.includes('email') || text.includes('gmail') || text.includes('calendar') || text.includes('schedule') || text.includes('drive') || text.includes('minutes') || text.includes('taylor') || text.includes('assistant')) {
       fallbackCode = 'ASSISTANT';
-    } else if (text.includes('manager') || text.includes('jordan') || text.includes('salud') || text.includes('sentry') || text.includes('postgres') || text.includes('reporte') || text.includes('noche') || text.includes('sueño')) {
+    } else if (text.includes('manager') || text.includes('jordan') || text.includes('health') || text.includes('sentry') || text.includes('postgres') || text.includes('report') || text.includes('night') || text.includes('sleep')) {
       fallbackCode = 'MANAGER';
     }
 
-    const fallbackAgent = this.agentStates.get(fallbackCode) || ceoState;
     ceoState.status = 'SUCCESS';
-    ceoState.bubbleMessage = 'Coordinación central: Supervisión activa de equipo y flujos n8n';
-    ceoState.currentAction = 'Atendiendo consulta en Chat Central de Oficina';
+    ceoState.bubbleMessage = 'Central coordination: Active supervision of team and automated workflows';
+    ceoState.currentAction = 'Attending query in Central Office Chat';
     ceoState.lastUpdated = new Date().toISOString();
-    ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Consulta en Chat: "${payload.message.slice(0, 50)}"`);
+    ceoState.recentLogs.unshift(`[${new Date().toLocaleTimeString()}] Chat query: "${payload.message.slice(0, 50)}"`);
     if (ceoState.recentLogs.length > 8) ceoState.recentLogs.pop();
 
     const fallbackReply =
-      `Reporte de Orquestación Central (Alex Vance - CEO & Tech Lead):\n` +
-      `He recibido tu instrucción: "${payload.message}".\n\n` +
-      `Estado actual del equipo multiagente y conexiones n8n:\n` +
-      `- Sam Rivera (Co-worker): Repositorios GitHub monitoreados (sleeply-core-engine, sleeply-web-office, meta-hackaton-agents). Suite Antigravity CLI lista.\n` +
-      `- Taylor Chen (Secretaria): Bandeja Gmail sin correos críticos. Agenda sincronizada en Google Calendar y documentos en Google Drive actualizados.\n` +
-      `- Jordan Díaz (Manager): Supervisión nocturna continua, base de datos PostgreSQL 100% saludable y 0 incidencias en Sentry.\n\n` +
-      `Puedes solicitar acciones directas como: hacer cambios en GitHub, triaje de correos, o auditoría del sistema.`;
+      `Central Orchestration Report (Alex Vance - CEO & Tech Lead):\n` +
+      `Received your instruction: "${payload.message}".\n\n` +
+      `Current multi-agent team and n8n connection status:\n` +
+      `- Sam Rivera (Co-worker): GitHub repositories monitored (sleeply-core-engine, sleeply-web-office, meta-hackaton-agents). Antigravity CLI suite ready.\n` +
+      `- Taylor Chen (Executive Assistant): Gmail inbox clear of critical items. Google Calendar synchronized and Google Drive deliverables up to date.\n` +
+      `- Jordan Díaz (Operations Manager): Continuous supervision active, PostgreSQL 17 database 100% healthy, and 0 unresolved Sentry incidents.\n\n` +
+      `You may request direct operations such as: GitHub changes, email triage, or comprehensive system auditing.`;
 
     return {
       success: true,
@@ -399,8 +505,8 @@ class AgentActivityService {
       agentName: ceoState.name,
       agentRole: ceoState.role,
       avatar: ceoState.avatar,
-      actionTaken: 'Orquestación general procesada (modo local)',
-      briefReport: 'BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO)\n- Servicios Conectados: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 flujos activos con Meta AI\n- Estado: 100% coordinado.',
+      actionTaken: 'General orchestration processed (local resilient mode)',
+      briefReport: 'BRIEF REPORT:\n- Principal Agent: Alex Vance (CEO)\n- Connected Services: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- n8n Workflows: 4 active workflows with Meta AI\n- Status: 100% coordinated.',
       timestamp: new Date().toISOString(),
     };
   }
@@ -412,27 +518,27 @@ class AgentActivityService {
     return [
       {
         name: 'sleeply-core-engine',
-        description: 'Motor central de orquestación, agentes continuos y scheduler',
+        description: 'Core orchestration engine, autonomous agents runtime, and task scheduler',
         branch: 'feature/agent-orchestration',
         openPRs: [{ id: 14, title: 'feat: add meta ai n8n connector', status: 'ready_for_review' }],
         commitsPending: 0,
-        status: 'Tarea terminada con éxito: Conexión multiagente validada',
+        status: 'Task completed successfully: Multi-agent connection validated',
       },
       {
         name: 'sleeply-web-office',
-        description: 'Oficina virtual isométrica 2D con Phaser 3, React y Chat interactivo',
+        description: '2D isometric virtual office with Phaser 3, React, and interactive agent chat',
         branch: 'full-agent-workflow',
         openPRs: [],
         commitsPending: 0,
-        status: 'Cambios aplicados: Chat multiagente y n8n integrados',
+        status: 'Changes applied: Multi-agent chat and n8n integrated',
       },
       {
         name: 'meta-hackaton-agents',
-        description: 'Arquitectura multiagente con flujos de trabajo n8n y Meta AI',
+        description: 'Multi-agent architecture with n8n workflows and Meta AI integration',
         branch: 'main',
         openPRs: [],
         commitsPending: 0,
-        status: 'Sincronizado con n8n-dev1.auto-node.tech',
+        status: 'Synchronized with n8n-dev1.auto-node.tech',
       },
     ];
   }
@@ -446,18 +552,18 @@ class AgentActivityService {
     customInstruction?: string;
     userId?: string;
   }) {
-    let taskTitle = `GitHub: Acción ${payload.actionType} en ${payload.repoName}`;
-    let taskDesc = payload.customInstruction || `Ejecutar ${payload.actionType} en repositorio ${payload.repoName}`;
+    let taskTitle = `GitHub: Action ${payload.actionType} on ${payload.repoName}`;
+    let taskDesc = payload.customInstruction || `Execute ${payload.actionType} in repository ${payload.repoName}`;
 
     if (payload.actionType === 'commit_changes') {
-      taskTitle = `Commit y registro de cambios en ${payload.repoName}`;
-      taskDesc = `Registrar commit y comentar que la tarea finalizó con éxito en ${payload.repoName}`;
+      taskTitle = `Commit and register code changes in ${payload.repoName}`;
+      taskDesc = `Register commit and comment that task completed successfully in ${payload.repoName}`;
     } else if (payload.actionType === 'review_pr') {
-      taskTitle = `Revisión y auditoría de PR #14 en ${payload.repoName}`;
-      taskDesc = `Auditoría técnica de código y aprobación de Pull Request #14`;
+      taskTitle = `Review and audit PR #14 in ${payload.repoName}`;
+      taskDesc = `Technical code audit and approval for Pull Request #14`;
     } else if (payload.actionType === 'run_cli_tests') {
-      taskTitle = `Suite de pruebas Antigravity CLI para ${payload.repoName}`;
-      taskDesc = `Ejecución de pruebas e2e, verificación de TypeScript y esquema PostgreSQL`;
+      taskTitle = `Antigravity CLI test suite execution for ${payload.repoName}`;
+      taskDesc = `End-to-end tests, TypeScript verification, and PostgreSQL schema inspection`;
     }
 
     return this.executeAgentAction('COWORKER', taskTitle, payload.userId);
@@ -471,35 +577,35 @@ class AgentActivityService {
       driveFiles: [
         {
           id: 'doc_final',
-          name: 'Sleeply_Entrega_Final_Proyecto.docx',
-          folder: 'Sleeply/Entregables',
+          name: 'Sleeply_Final_Project_Deliverable.docx',
+          folder: 'Sleeply/Deliverables',
           modified: new Date().toISOString(),
-          status: 'Comentado: Tarea terminada con éxito. Multiagente y chat n8n validados.',
+          status: 'Commented: Task completed successfully. Multi-agent system and n8n chat validated.',
         },
         {
           id: 'doc_01',
-          name: 'Minuta_Reunion_Estrategica_Q4.docx',
-          folder: 'Sleeply/Minutas',
+          name: 'Strategic_Meeting_Minutes_Q4.docx',
+          folder: 'Sleeply/Minutes',
           modified: new Date().toISOString(),
-          status: 'Archivada',
+          status: 'Archived',
         },
         {
           id: 'sheet_02',
-          name: 'Presupuesto_Operativo_2026.xlsx',
-          folder: 'Sleeply/Finanzas',
+          name: 'Operating_Budget_2026.xlsx',
+          folder: 'Sleeply/Finance',
           modified: new Date().toISOString(),
-          status: 'Aprobado',
+          status: 'Approved',
         },
       ],
       gmailStatus: {
         unread: 2,
         highPriority: 1,
-        snippet: 'Propuesta Q4 y reporte semanal de servidores clasificados.',
+        snippet: 'Q4 proposal and weekly server classification report.',
       },
       calendarStatus: {
         eventsToday: 2,
         conflicts: 0,
-        nextEvent: 'Daily Standup de Equipo (09:00 AM)',
+        nextEvent: 'Daily Team Standup (09:00 AM)',
       },
     };
   }
@@ -513,18 +619,18 @@ class AgentActivityService {
     customInstruction?: string;
     userId?: string;
   }) {
-    let taskTitle = `Google Drive / Asistente: ${payload.actionType}`;
-    let taskDesc = payload.customInstruction || `Operación de asistente ejecutiva`;
+    let taskTitle = `Google Drive / Assistant: ${payload.actionType}`;
+    let taskDesc = payload.customInstruction || `Executive assistant operation`;
 
     if (payload.actionType === 'update_drive') {
-      taskTitle = `Actualizar documento en Google Drive y comentar éxito`;
-      taskDesc = `Registrar en Google Drive que la tarea finalizó con éxito y archivar minuta de entrega`;
+      taskTitle = `Update Google Drive deliverable and record success status`;
+      taskDesc = `Record in Google Drive that task completed successfully and archive meeting minutes`;
     } else if (payload.actionType === 'gmail_triage') {
-      taskTitle = `Triage de correos urgentes en Gmail`;
-      taskDesc = `Clasificar correos de clientes y miembros de equipo`;
+      taskTitle = `Triage priority emails in Gmail`;
+      taskDesc = `Classify client inquiries and team notifications`;
     } else if (payload.actionType === 'calendar_sync') {
-      taskTitle = `Coordinación de eventos en Google Calendar`;
-      taskDesc = `Revisar compromisos del día y verificar ausencia de colisiones`;
+      taskTitle = `Coordinate schedule in Google Calendar`;
+      taskDesc = `Review today commitments and ensure conflict-free calendar`;
     }
 
     return this.executeAgentAction('ASSISTANT', taskTitle, payload.userId);
@@ -538,7 +644,7 @@ class AgentActivityService {
       systemStatus: 'HEALTHY',
       uptime: '99.98%',
       database: {
-        name: 'sleeply_db (PostgreSQL 17 en localhost:5432)',
+        name: 'sleeply_db (PostgreSQL 17 on localhost:5432)',
         status: 'CONNECTED',
         tasksCompleted: 12,
         tasksInProgress: 1,
@@ -550,8 +656,8 @@ class AgentActivityService {
         healthScore: 100,
       },
       notifications: {
-        telegramChannel: 'Activo (@sleeply_ceo)',
-        discordWebhook: 'Activo (#exec-updates)',
+        telegramChannel: 'Active (@sleeply_ceo)',
+        discordWebhook: 'Active (#exec-updates)',
       },
     };
   }
@@ -565,17 +671,17 @@ class AgentActivityService {
     userId?: string;
   }) {
     let taskTitle = `Manager: ${payload.actionType}`;
-    let taskDesc = payload.customInstruction || `Operación de supervisión operativa`;
+    let taskDesc = payload.customInstruction || `Operational supervision task`;
 
     if (payload.actionType === 'morning_report') {
-      taskTitle = `Compilación de reporte matutino y auditoría modo sueño`;
-      taskDesc = `Consolidar tareas de la noche, estado de PostgreSQL y emitir reporte matutino`;
+      taskTitle = `Compile morning executive report and sleep mode audit`;
+      taskDesc = `Consolidate overnight tasks, PostgreSQL health, and deliver executive morning report`;
     } else if (payload.actionType === 'system_audit') {
-      taskTitle = `Auditoría integral de salud del sistema`;
-      taskDesc = `Verificar base de datos PostgreSQL, colas y disponibilidad de servicios n8n`;
+      taskTitle = `Comprehensive system health and service audit`;
+      taskDesc = `Verify PostgreSQL database, queues, and n8n service availability`;
     } else if (payload.actionType === 'send_alert') {
-      taskTitle = `Despachar notificación de estado a Telegram y Discord`;
-      taskDesc = `Enviar resumen de supervisión a los canales oficiales del equipo`;
+      taskTitle = `Dispatch status notification to Telegram and Discord`;
+      taskDesc = `Send operational summary to official team channels`;
     }
 
     return this.executeAgentAction('MANAGER', taskTitle, payload.userId);
@@ -583,4 +689,3 @@ class AgentActivityService {
 }
 
 export const agentActivityService = new AgentActivityService();
-
