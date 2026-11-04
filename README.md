@@ -1,5 +1,9 @@
 # Sleeply
 
+<p align="center">
+  <img src="frontend/src/assets/sleeply%20(svg).svg" alt="Sleeply Logo" width="300" />
+</p>
+
 Plataforma de oficina virtual isométrica en 2D que combina supervisión y delegación de tareas con agentes de inteligencia artificial autónomos, operando en dos modalidades:
 
 - **Modo Vigilia (Día):** Supervisión interactiva, manipulación de la oficina y diálogo síncrono con agentes.

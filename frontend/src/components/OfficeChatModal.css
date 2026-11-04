@@ -460,3 +460,48 @@
   color: #64748b;
   cursor: not-allowed;
 }
+
+/* Brief Report Box in Chat */
+.brief-report-box {
+  margin-top: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.brief-report-tag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  padding-bottom: 4px;
+}
+
+.brief-report-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #38bdf8;
+  letter-spacing: 0.04em;
+}
+
+.brief-report-badge {
+  font-size: 0.68rem;
+  background: rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #93c5fd;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.brief-report-content {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+.brief-report-line {
+  margin: 2px 0;
+}

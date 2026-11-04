@@ -965,3 +965,221 @@
   cursor: not-allowed;
 }
 
+
+/* Agent Only Buttons Design */
+.agent-buttons-modal {
+  max-width: 780px;
+}
+
+.agent-identity-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+}
+
+.agent-identity-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.agent-identity-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agent-identity-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.agent-name-label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.agent-role-tag {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  background: rgba(30, 41, 59, 0.8);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-workflow-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.agent-bubble-strip {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+.agent-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  overflow-y: auto;
+  max-height: 52vh;
+  padding-right: 4px;
+}
+
+.agent-buttons-title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agent-action-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.agent-action-card-btn {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agent-action-card-btn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.18);
+  border-color: rgba(56, 189, 248, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.agent-action-card-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.agent-action-card-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-btn-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.card-btn-icon {
+  font-size: 1.25rem;
+}
+
+.card-btn-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.card-btn-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.card-btn-desc {
+  font-size: 0.77rem;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.card-btn-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.action-success-banner {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.action-success-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #34d399;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+}
+
+.action-success-badge {
+  margin-left: auto;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  background: rgba(16, 185, 129, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.action-success-text {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.agent-buttons-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+  font-size: 0.74rem;
+  color: #64748b;
+  text-align: center;
+}

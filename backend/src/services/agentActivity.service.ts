@@ -31,8 +31,8 @@ class AgentActivityService {
       role: 'CEO & Tech Lead',
       avatar: 'char_0',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Conversational AI Agent (Alex Vance)',
-      workflowId: 'dQcgAMxGLkhwItEv',
+      activeWorkflow: 'Sleeply - Secretaria Servicios Google (Taylor Chen)',
+      workflowId: 'Y98OZScIcjwGqq5d',
       currentAction: 'Dirección general y orquestación estratégica',
       bubbleMessage: 'Oficina conectada: Supervisión y arquitectura activas',
       metaAiEndpoint: 'https://api.meta.ai/v1',
@@ -50,8 +50,8 @@ class AgentActivityService {
       role: 'Secretaria / Asistente',
       avatar: 'char_2',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Secretary Gmail & Calendar Manager',
-      workflowId: 'OGiWBz0XS8YCKsV7',
+      activeWorkflow: 'Sleeply - Secretaria Servicios Google (Taylor Chen)',
+      workflowId: 'Y98OZScIcjwGqq5d',
       currentAction: 'Monitoreando correos entrantes de Gmail',
       bubbleMessage: 'Bandeja sincronizada: Sin correos urgentes pendientes',
       metaAiEndpoint: 'https://api.meta.ai/v1',
@@ -69,8 +69,8 @@ class AgentActivityService {
       role: 'Co-worker / Desarrollador',
       avatar: 'char_1',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Co-worker GitHub & Code Executor',
-      workflowId: 'CkATRASNrEraPrfQ',
+      activeWorkflow: 'Sleeply - Co-worker GitHub & Desarrollo (Sam Rivera)',
+      workflowId: '0J1BLgM3KzQOD4f3',
       currentAction: 'Listo para recibir requerimientos en GitHub',
       bubbleMessage: 'Repositorio inspeccionado: 0 conflictos en ramas',
       metaAiEndpoint: 'https://api.meta.ai/v1',
@@ -88,8 +88,8 @@ class AgentActivityService {
       role: 'Manager / Supervisor',
       avatar: 'char_3',
       status: 'IDLE',
-      activeWorkflow: 'Sleeply - Manager Nightly Monitor & Report',
-      workflowId: 'zINHYbE6372bGGJW',
+      activeWorkflow: 'Sleeply - Manager Monitoreo & Supervisión (Jordan Díaz)',
+      workflowId: 'aMq0v6FgezOyhvHH',
       currentAction: 'Supervisión de salud del sistema',
       bubbleMessage: 'Sistema 100% saludable: Preparando reporte matutino',
       metaAiEndpoint: 'https://api.meta.ai/v1',
@@ -271,6 +271,7 @@ class AgentActivityService {
     agentRole: string;
     avatar: string;
     actionTaken?: string;
+    briefReport?: string;
     timestamp: string;
   }> {
     const ceoState = this.agentStates.get('CEO')!;
@@ -358,6 +359,7 @@ class AgentActivityService {
         agentRole: respondingState.role,
         avatar: respondingState.avatar,
         actionTaken,
+        briefReport: resBody.briefReport || (resBody.output?.includes('BREVE REPORTE:') ? resBody.output.slice(resBody.output.indexOf('BREVE REPORTE:')) : 'BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO)\n- Servicios: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 flujos activos con Meta AI\n- Estado: 100% operativo.'),
         timestamp: resBody.timestamp || new Date().toISOString(),
       };
     }
@@ -398,6 +400,7 @@ class AgentActivityService {
       agentRole: ceoState.role,
       avatar: ceoState.avatar,
       actionTaken: 'Orquestación general procesada (modo local)',
+      briefReport: 'BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO)\n- Servicios Conectados: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 flujos activos con Meta AI\n- Estado: 100% coordinado.',
       timestamp: new Date().toISOString(),
     };
   }

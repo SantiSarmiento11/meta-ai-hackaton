@@ -1,0 +1,168 @@
+{
+  "name": "Sleeply - Chat Principal & Orquestador (Alex Vance)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sleeply-chat-principal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-chat-webhook",
+      "name": "Webhook Trigger (Chat Principal)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        180,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Consulta de oficina: \" + ($json.body?.message || $json.body?.taskTitle || $json.message || \"Consulta general\") + \".\\nContexto: \" + ($json.body?.taskDescription || \"Coordinación ejecutiva en oficina Sleeply\") + \".\\nInstrucciones:\\n1. Genera una respuesta clara, concisa y ejecutiva.\\n2. Finaliza OBLIGATORIAMENTE con una sección estructurada:\\nBREVE REPORTE:\\n- Agente Principal: Alex Vance (CEO)\\n- Servicios Conectados: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\\n- Acciones Coordinadas: Estado de tareas en progreso\\n- Próximos Pasos: Seguimiento automático\\nREGLA MANDATORIA: Prohibido usar emojis.\" }}",
+        "options": {
+          "systemMessage": "Eres Alex Vance, CEO, Tech Lead y Agente de Chat Principal de Sleeply. Eres un agente multi-función capaz de analizar requerimientos, consultar el estado de todos los servicios conectados (GitHub: SantiSarmiento11, Gmail/Calendar/Drive: sansamablogers@gmail.com, PostgreSQL y Sentry) y coordinar al equipo. Siempre entregas una respuesta profesional seguida de un BREVE REPORTE. Jamás incluyas emojis en tu salida."
+        }
+      },
+      "id": "node-chat-agent",
+      "name": "Chat Principal AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        440,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "muse-spark-1.3-contributor",
+          "mode": "list",
+          "cachedResultName": "muse-spark-1.3-contributor"
+        },
+        "options": {
+          "baseURL": "https://api.meta.ai/v1"
+        }
+      },
+      "id": "node-chat-meta-ai",
+      "name": "Meta AI Reasoning (OpenAI Compatible)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        440,
+        440
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "xQIIgSy2GPfaF4vk",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "office_multi_service_tool",
+        "description": "Consulta el estado en vivo de los servicios conectados: GitHub (SantiSarmiento11), Gmail (sansamablogers@gmail.com), Google Drive, Calendar y Base de datos.",
+        "jsCode": "return JSON.stringify({\n  office: \"Sleeply Smart Office\",\n  principalAgent: \"Alex Vance (CEO)\",\n  services: {\n    github: { user: \"SantiSarmiento11\", status: \"Conectado\", repos: [\"sleeply-core-engine\", \"sleeply-web-office\", \"meta-hackaton-agents\"] },\n    gmail: { email: \"sansamablogers@gmail.com\", status: \"Sincronizado\" },\n    googleDrive: { status: \"Activo\", folder: \"/Sleeply\" },\n    googleCalendar: { status: \"Conectado\", calendar: \"Principal & Feriados\" },\n    database: { host: \"localhost:5432\", status: \"Saludable\" }\n  },\n  status: \"Todos los servicios en línea y coordinados.\"\n});"
+      },
+      "id": "node-chat-tool",
+      "name": "Multi-Service Overview Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst rawOutput = (item && item.output) ? String(item.output) : '';\nconst cleanOutput = rawOutput\n  .replace(/[\\u{1F600}-\\u{1F64F}\\u{1F300}-\\u{1F5FF}\\u{1F680}-\\u{1F6FF}\\u{1F1E0}-\\u{1F1FF}\\u{2600}-\\u{26FF}\\u{2700}-\\u{27BF}\\u{1F900}-\\u{1F9FF}\\u{1FA00}-\\u{1FAFF}\\u{FE00}-\\u{FE0F}]/gu, '')\n  .trim();\n\nconst lines = cleanOutput.split('\\n').map(l => l.trim()).filter(Boolean);\nconst firstLine = lines[0] || 'Atención de Chat Principal completada';\nconst bubbleMessage = firstLine.slice(0, 160);\n\nlet briefReport = '';\nconst reportIndex = cleanOutput.indexOf('BREVE REPORTE:');\nif (reportIndex !== -1) {\n  briefReport = cleanOutput.slice(reportIndex).trim();\n} else {\n  briefReport = 'BREVE REPORTE:\\n- Agente Principal: Alex Vance\\n- Servicios: GitHub, Gmail, Drive y Calendar operativos.\\n- Estado: 100% coordinado.';\n}\n\nreturn [{\n  json: {\n    success: true,\n    agentCode: 'CEO',\n    agentName: 'Alex Vance',\n    role: 'CEO & Tech Lead / Agente de Chat Principal',\n    status: 'SUCCESS',\n    activeWorkflow: 'Sleeply - Chat Principal & Orquestador (Alex Vance)',\n    output: cleanOutput || rawOutput,\n    briefReport: briefReport,\n    bubbleMessage: bubbleMessage,\n    currentAction: 'Atención en Chat Principal completada con breve reporte',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "node-chat-format",
+      "name": "Format Result & Brief Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "node-chat-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger (Chat Principal)": {
+      "main": [
+        [
+          {
+            "node": "Chat Principal AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Principal AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Result & Brief Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Result & Brief Report": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta AI Reasoning (OpenAI Compatible)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat Principal AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Multi-Service Overview Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Chat Principal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

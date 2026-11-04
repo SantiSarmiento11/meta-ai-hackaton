@@ -81,6 +81,7 @@ export interface ChatMessage {
   avatar?: string;
   text: string;
   actionTaken?: string;
+  briefReport?: string;
   timestamp: string;
 }
 
@@ -92,6 +93,7 @@ export interface ChatResponse {
   agentRole: string;
   avatar: string;
   actionTaken?: string;
+  briefReport?: string;
   timestamp: string;
 }
 

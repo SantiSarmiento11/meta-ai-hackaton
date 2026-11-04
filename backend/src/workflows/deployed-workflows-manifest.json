@@ -1,0 +1,26 @@
+{
+  "CEO": {
+    "id": "HKDqzxQSleroRA0V",
+    "name": "Sleeply - Chat Principal & Orquestador (Alex Vance)",
+    "active": true,
+    "webhookPath": "sleeply-chat-principal"
+  },
+  "ASSISTANT": {
+    "id": "Ei8laDc9CAdA4IaB",
+    "name": "Sleeply - Secretaria Multi-Servicios (Taylor Chen)",
+    "active": true,
+    "webhookPath": "sleeply-secretary-agent"
+  },
+  "COWORKER": {
+    "id": "jMxiFZxMnkl9LsbQ",
+    "name": "Sleeply - Co-worker GitHub & Code Executor (Sam Rivera)",
+    "active": true,
+    "webhookPath": "sleeply-coworker-agent"
+  },
+  "MANAGER": {
+    "id": "uwJCpuo5d0650cIv",
+    "name": "Sleeply - Manager Nightly Monitor & Report (Jordan Díaz)",
+    "active": true,
+    "webhookPath": "sleeply-manager-agent"
+  }
+}

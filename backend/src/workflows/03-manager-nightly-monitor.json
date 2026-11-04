@@ -1,5 +1,5 @@
 {
-  "name": "Sleeply - Manager Nightly Monitor & Report",
+  "name": "Sleeply - Manager Nightly Monitor & Report (Jordan Díaz)",
   "nodes": [
     {
       "parameters": {
@@ -8,25 +8,31 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "manager-node-webhook",
-      "name": "Webhook / Night Mode Trigger",
+      "id": "node-mgr-webhook",
+      "name": "Webhook Trigger (Manager)",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [180, 240]
+      "position": [
+        180,
+        240
+      ]
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ \"Tarea de supervisión asignada: \" + ($json.body?.taskTitle || $json.taskTitle || \"Auditoría nocturna y reporte matutino\") + \".\\nDetalles: \" + ($json.body?.taskDescription || $json.taskDescription || \"Supervisar tareas en PostgreSQL, incidentes en Sentry y notificar por Discord y Telegram\") + \".\\nModo: \" + ($json.body?.operatingMode || $json.operatingMode || \"sleep\") + \".\\nInstrucciones: Utiliza las herramientas de PostgreSQL Monitor, Sentry y Notificador para auditar el estado del sistema y compilar el reporte ejecutivo. REGLA ESTRICTA MANDATORIA: No incluyas ningún emoji o emoticono en tu respuesta.\" }}",
+        "text": "={{ \"Instrucción de supervisión para Jordan Díaz (Manager): \" + ($json.body?.actionName || $json.body?.taskTitle || $json.body?.actionType || \"Monitoreo de Operaciones y Salud\") + \".\\nDetalles: \" + ($json.body?.taskDescription || $json.body?.customText || \"Supervisión de salud del sistema, base de datos PostgreSQL y Modo Noche\") + \".\\nInstrucciones: Evalúa el estado del sistema con tus herramientas y emite un reporte ejecutivo sin ningún emoji.\" }}",
         "options": {
-          "systemMessage": "Eres Jordan Díaz, Manager y supervisor de operaciones oficial de Sleeply. Tu función es auditar tareas en PostgreSQL, detectar incidentes en Sentry, evaluar la salud del sistema y emitir notificaciones por Discord y Telegram. REGLA ESTRICTA MANDATORIA: Tienes terminantemente prohibido incluir emojis o emoticonos en cualquier parte de tu salida. Toda tu respuesta debe ser estrictamente en texto ejecutivo, estructurado, conciso y profesional sin ningún emoji."
+          "systemMessage": "Eres Jordan Díaz, Manager y Supervisor de Operaciones de Sleeply. Supervisas la salud de la infraestructura, base de datos PostgreSQL, alertas y el reporte nocturno. Prohibido usar emojis."
         }
       },
-      "id": "manager-node-agent",
+      "id": "node-mgr-agent",
       "name": "Manager AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
-      "position": [440, 240]
+      "position": [
+        440,
+        240
+      ]
     },
     {
       "parameters": {
@@ -40,11 +46,14 @@
           "baseURL": "https://api.meta.ai/v1"
         }
       },
-      "id": "manager-node-meta-ai",
+      "id": "node-mgr-meta-ai",
       "name": "Meta AI Reasoning (OpenAI Compatible)",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
-      "position": [440, 440],
+      "position": [
+        340,
+        440
+      ],
       "credentials": {
         "openAiApi": {
           "id": "xQIIgSy2GPfaF4vk",
@@ -54,49 +63,46 @@
     },
     {
       "parameters": {
-        "name": "postgres_tasks_monitor",
-        "description": "Consulta en la base de datos PostgreSQL el estado de las tareas delegadas y el progreso de los agentes.",
-        "jsCode": "return JSON.stringify({\n  database: 'sleeply_db',\n  host: 'localhost:5432',\n  totalTasks: 5,\n  inProgress: 2,\n  completed: 3,\n  blockedOrFailed: 0,\n  status: 'HEALTHY'\n});"
+        "name": "system_health_tool",
+        "description": "Supervisa el estado de la base de datos PostgreSQL en localhost:5432 y métricas de confiabilidad Sentry.",
+        "jsCode": "return JSON.stringify({\n  database: \"PostgreSQL 17 (sleeply_db)\",\n  dbStatus: \"HEALTHY\",\n  activeLocks: 0,\n  sentryHealthScore: 100,\n  activeIncidents: 0,\n  uptime: \"99.98%\",\n  summary: \"Infraestructura completamente saludable.\"\n});"
       },
-      "id": "manager-node-tool-postgres",
-      "name": "PostgreSQL Monitor Tool",
+      "id": "node-mgr-tool-health",
+      "name": "System Health Tool",
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
-      "position": [640, 440]
+      "position": [
+        540,
+        440
+      ]
     },
     {
       "parameters": {
-        "name": "sentry_error_monitor",
-        "description": "Inspecciona alertas y excepciones no controladas en Sentry para clasificar su impacto.",
-        "jsCode": "return JSON.stringify({\n  activeIncidents: 0,\n  resolvedIncidents: 4,\n  systemHealth: 100,\n  notes: 'Sin anomalias criticas en servicios centrales.'\n});"
+        "name": "night_mode_monitor_tool",
+        "description": "Supervisa el ciclo de Modo Sueño (Nightly Mode) y genera el resumen matutino para la dirección.",
+        "jsCode": "return JSON.stringify({\n  mode: \"Modo Sueño / Supervisión Continua\",\n  backgroundTasksProcessed: 18,\n  anomaliesDetected: 0,\n  reportStatus: \"Reporte ejecutivo matutino compilado y listo.\"\n});"
       },
-      "id": "manager-node-tool-sentry",
-      "name": "Sentry & Error Monitor Tool",
+      "id": "node-mgr-tool-night",
+      "name": "Night Mode Monitor Tool",
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
-      "position": [780, 440]
+      "position": [
+        720,
+        440
+      ]
     },
     {
       "parameters": {
-        "name": "discord_telegram_notifier",
-        "description": "Despacha el reporte matutino o alertas de supervision a los canales de Discord y Telegram del equipo.",
-        "jsCode": "return JSON.stringify({\n  channels: ['Discord #exec-updates', 'Telegram @sleeply_ceo'],\n  delivered: true,\n  reportSummary: 'Reporte matutino despachado: 100% disponibilidad del sistema, 0 incidentes criticos.',\n  timestamp: new Date().toISOString()\n});"
+        "jsCode": "const item = $input.first().json;\nconst rawOutput = (item && item.output) ? String(item.output) : '';\nconst cleanOutput = rawOutput\n  .replace(/[\\u{1F600}-\\u{1F64F}\\u{1F300}-\\u{1F5FF}\\u{1F680}-\\u{1F6FF}\\u{1F1E0}-\\u{1F1FF}\\u{2600}-\\u{26FF}\\u{2700}-\\u{27BF}\\u{1F900}-\\u{1F9FF}\\u{1FA00}-\\u{1FAFF}\\u{FE00}-\\u{FE0F}]/gu, '')\n  .trim();\n\nconst lines = cleanOutput.split('\\n').map(l => l.trim()).filter(Boolean);\nconst firstLine = lines[0] || 'Supervisión de salud del sistema completada';\nconst bubbleMessage = firstLine.slice(0, 160);\n\nreturn [{\n  json: {\n    success: true,\n    agentCode: 'MANAGER',\n    agentName: 'Jordan Díaz',\n    role: 'Manager / Supervisor de Operaciones',\n    status: 'SUCCESS',\n    activeWorkflow: 'Sleeply - Manager Nightly Monitor & Report (Jordan Díaz)',\n    output: cleanOutput || rawOutput,\n    bubbleMessage: bubbleMessage,\n    currentAction: 'Supervisión de infraestructura y reporte matutino finalizado',\n    systemStatus: '100% Saludable',\n    timestamp: new Date().toISOString()\n  }\n}];"
       },
-      "id": "manager-node-tool-notifier",
-      "name": "Discord & Telegram Notifier Tool",
-      "type": "@n8n/n8n-nodes-langchain.toolCode",
-      "typeVersion": 1.1,
-      "position": [920, 440]
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = $input.first().json;\nconst rawOutput = (item && item.output) ? String(item.output) : '';\nconst cleanOutput = rawOutput\n  .replace(/[\\u{1F600}-\\u{1F64F}\\u{1F300}-\\u{1F5FF}\\u{1F680}-\\u{1F6FF}\\u{1F1E0}-\\u{1F1FF}\\u{2600}-\\u{26FF}\\u{2700}-\\u{27BF}\\u{1F900}-\\u{1F9FF}\\u{1FA00}-\\u{1FAFF}\\u{FE00}-\\u{FE0F}]/gu, '')\n  .trim();\n\nconst lines = cleanOutput.split('\\n').map(l => l.trim()).filter(Boolean);\nconst firstLine = lines[0] || 'Supervisión de salud del sistema completada';\nconst bubbleMessage = firstLine.slice(0, 160);\n\nreturn [{\n  json: {\n    success: true,\n    agentCode: 'MANAGER',\n    agentName: 'Jordan Díaz',\n    role: 'Manager / Supervisor',\n    status: 'SUCCESS',\n    activeWorkflow: 'Sleeply - Manager Nightly Monitor & Report',\n    output: cleanOutput || rawOutput,\n    bubbleMessage: bubbleMessage,\n    currentAction: 'Supervisión nocturna y reporte de salud completado',\n    logEntry: cleanOutput.slice(0, 260),\n    metaAiEndpoint: 'https://api.meta.ai/v1',\n    timestamp: new Date().toISOString()\n  }\n}];"
-      },
-      "id": "manager-node-format",
-      "name": "Format Agent Result",
+      "id": "node-mgr-format",
+      "name": "Format Manager Result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [680, 240]
+      "position": [
+        680,
+        240
+      ]
     },
     {
       "parameters": {
@@ -104,44 +110,18 @@
         "responseBody": "={{ JSON.stringify($json) }}",
         "options": {}
       },
-      "id": "manager-node-respond",
+      "id": "node-mgr-respond",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [880, 240]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $node[\"Webhook / Night Mode Trigger\"].json.body?.callbackUrl || $node[\"Webhook / Night Mode Trigger\"].json.callbackUrl || \"http://localhost:3001/api/agents/activity\" }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "X-N8N-API-KEY",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxYjQyMGNmMS05OTk0LTQxNDQtODc1NS0xNDU0YmZiODY4YmMiLCJpc3MiOiJuOG4iLCJqdGkiOiJkN2M4ZTRlMS1hZjJmLTQ1NDYtODYxZS1mNGE1ZGJkNWQwZDQiLCJpYXQiOjE3OTM3NDkyMTIsImV4cCI6MTc5NjI1NjAwMCwiYXVkIjoicHVibGljLWFwaSJ9._I8D9sbO9h0SbrBmWldsV9xO7uFKILM4sMaAmpov3RY"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify($json) }}",
-        "options": {}
-      },
-      "id": "manager-node-backend-sync",
-      "name": "Sync Status with Sleeply Backend",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1080, 240],
-      "continueOnFail": true
+      "position": [
+        900,
+        240
+      ]
     }
   ],
   "connections": {
-    "Webhook / Night Mode Trigger": {
+    "Webhook Trigger (Manager)": {
       "main": [
         [
           {
@@ -156,29 +136,18 @@
       "main": [
         [
           {
-            "node": "Format Agent Result",
+            "node": "Format Manager Result",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Agent Result": {
+    "Format Manager Result": {
       "main": [
         [
           {
             "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Respond to Webhook": {
-      "main": [
-        [
-          {
-            "node": "Sync Status with Sleeply Backend",
             "type": "main",
             "index": 0
           }
@@ -196,7 +165,7 @@
         ]
       ]
     },
-    "PostgreSQL Monitor Tool": {
+    "System Health Tool": {
       "ai_tool": [
         [
           {
@@ -207,18 +176,7 @@
         ]
       ]
     },
-    "Sentry & Error Monitor Tool": {
-      "ai_tool": [
-        [
-          {
-            "node": "Manager AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Discord & Telegram Notifier Tool": {
+    "Night Mode Monitor Tool": {
       "ai_tool": [
         [
           {
@@ -231,8 +189,6 @@
     }
   },
   "settings": {
-    "executionOrder": "v1",
-    "saveDataSuccessExecution": "all",
-    "saveManualExecutions": true
+    "executionOrder": "v1"
   }
 }

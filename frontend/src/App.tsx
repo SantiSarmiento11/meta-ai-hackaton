@@ -282,8 +282,12 @@ function App() {
     };
 
     const handleAgentSelected = (code: 'ASSISTANT' | 'COWORKER' | 'MANAGER' | 'CEO') => {
-      setSelectedAgentCode(code);
-      setIsN8nModalOpen(true);
+      if (code === 'CEO') {
+        setIsChatOpen(true);
+      } else {
+        setSelectedAgentCode(code);
+        setIsN8nModalOpen(true);
+      }
     };
 
     gameInstance.events.on('mode-changed', handleModeChanged);

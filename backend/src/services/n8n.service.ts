@@ -127,23 +127,23 @@ export class N8nService {
    */
   public static readonly AGENT_WEBHOOKS: Record<string, { webhookPath: string; workflowId: string; name: string }> = {
     CEO: {
-      webhookPath: '/webhook/sleeply-ceo-agent',
-      workflowId: 'dQcgAMxGLkhwItEv',
+      webhookPath: '/webhook/sleeply-chat-principal',
+      workflowId: 'HKDqzxQSleroRA0V',
       name: 'Alex Vance',
     },
     ASSISTANT: {
       webhookPath: '/webhook/sleeply-secretary-agent',
-      workflowId: 'OGiWBz0XS8YCKsV7',
+      workflowId: 'Ei8laDc9CAdA4IaB',
       name: 'Taylor Chen',
     },
     COWORKER: {
       webhookPath: '/webhook/sleeply-coworker-agent',
-      workflowId: 'CkATRASNrEraPrfQ',
+      workflowId: 'jMxiFZxMnkl9LsbQ',
       name: 'Sam Rivera',
     },
     MANAGER: {
       webhookPath: '/webhook/sleeply-manager-agent',
-      workflowId: 'zINHYbE6372bGGJW',
+      workflowId: 'uwJCpuo5d0650cIv',
       name: 'Jordan Díaz',
     },
   };

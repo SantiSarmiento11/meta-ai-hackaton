@@ -39,6 +39,7 @@ export const OfficeChatModal: React.FC<OfficeChatModalProps> = ({
         '• Taylor Chen (Secretaria): Gestión de Gmail, Google Calendar y almacenamiento en Google Drive.\n' +
         '• Jordan Díaz (Manager): Supervisión continua, persistencia PostgreSQL y reportes ejecutivos.\n\n' +
         'Puedes escribirme cualquier orden en lenguaje natural o utilizar las acciones rápidas abajo.',
+      briefReport: 'BREVE REPORTE:\n- Agente Principal: Alex Vance (CEO)\n- Servicios Conectados: GitHub (SantiSarmiento11), Gmail & Drive & Calendar (sansamablogers@gmail.com)\n- Workflows n8n: 4 flujos activos con Meta AI\n- Estado: 100% coordinado.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -88,6 +89,7 @@ export const OfficeChatModal: React.FC<OfficeChatModalProps> = ({
         avatar: response.avatar,
         text: response.reply,
         actionTaken: response.actionTaken,
+        briefReport: response.briefReport,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
@@ -212,6 +214,20 @@ export const OfficeChatModal: React.FC<OfficeChatModalProps> = ({
                       </p>
                     ))}
                   </div>
+
+                  {msg.briefReport && (
+                    <div className="brief-report-box">
+                      <div className="brief-report-tag">
+                        <span className="brief-report-title">Breve Reporte Ejecutivo</span>
+                        <span className="brief-report-badge">Meta AI • n8n</span>
+                      </div>
+                      <div className="brief-report-content">
+                        {msg.briefReport.split('\n').map((line: string, idx: number) => (
+                          <p key={idx} className="brief-report-line">{line}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <span className="bubble-timestamp">{msg.timestamp}</span>
                 </div>
