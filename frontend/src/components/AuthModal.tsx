@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import sleeplyLogo from '../assets/sleeply (svg).svg';
 import dayRoomImg from '../assets/Rooms/Rooms FInal Version/Oficina isométrica  dia con logo Sleeply.png';
 import nightRoomImg from '../assets/Rooms/Rooms FInal Version/Oficina nocturna con neón Sleeply.png';
+import loginBgImg from '../assets/Fondo azul nocturno con diseño isométrico para el login.png';
 import char0Full from '../assets/characters/char_0_full.png';
 import char1Full from '../assets/characters/char_1_full.png';
 import char2Full from '../assets/characters/char_2_full.png';
@@ -68,7 +69,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="auth-fullscreen-container" role="dialog" aria-modal="true">
+    <div
+      className="auth-fullscreen-container"
+      style={{ '--auth-bg-url': `url("${loginBgImg}")` } as React.CSSProperties}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="auth-fullscreen-wrapper">
         {/* Left Column: Visual Game Showcase */}
         <div className="auth-showcase-panel">
